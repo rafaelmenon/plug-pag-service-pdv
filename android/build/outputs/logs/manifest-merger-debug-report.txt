@@ -1,0 +1,41 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+	package
+		ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:2:11-37
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+		ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+		ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:1-6:12
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:1:11-69
+uses-permission#br.com.uol.pagseguro.permission.MANAGE_PAYMENTS
+ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:4:5-86
+	android:name
+		ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:4:22-84
+uses-sdk
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+		ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+		ADDED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+		INJECTED from /home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml

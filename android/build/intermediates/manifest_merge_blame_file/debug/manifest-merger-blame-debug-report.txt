@@ -1,0 +1,17 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.reactlibrary"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="19"
+8-->/home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="29" />
+9-->/home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml
+10
+11    <uses-permission android:name="br.com.uol.pagseguro.permission.MANAGE_PAYMENTS" />
+11-->/home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:4:5-86
+11-->/home/rafael/Documentos/android-pdv/pdv365-pos-android-nfc/node_modules/react-native-plug-pag-service/android/src/main/AndroidManifest.xml:4:22-84
+12
+13</manifest>
