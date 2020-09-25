@@ -1,5 +1,6 @@
 package com.reactlibrary;
 
+import android.os.Build;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -176,15 +177,46 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         }
     }
 
+    /*Método para pegar o serial do pos*/
     @ReactMethod
-    public void readNFCCard(Promise promise) throws UnsupportedEncodingException {
+    public void getSerialNumber(Promise promise) throws NoSuchFieldException, IllegalAccessException {
+        String deviceSerial = (String) Build.class.getField("SERIAL").get(null);
+        promise.resolve(deviceSerial);
+    }
+
+    /* Método temporário para o pos */
+    @ReactMethod
+    public void temporaryReadNFC(int slot, Promise promise) {
+        System.out.println("slot passado ->>>>>" + slot);
+        String identification = "4549430934564676";
+        promise.resolve(identification);
+    }
+
+
+    /* Método para ler o cartão*/
+    @ReactMethod
+    public void readNFCCard(int slot, Promise promise) throws UnsupportedEncodingException {
         PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
-        dataCard.setStartSlot(1);
-        dataCard.setEndSlot(1);
+        dataCard.setStartSlot(slot);
+        dataCard.setEndSlot(slot);
         PlugPagNFCResult result = plugPag.readFromNFCCard(dataCard);
         String returnValue = new String(result.getSlots()[result.getStartSlot()].get("data"), "UTF-8");
         promise.resolve(returnValue);
-        System.out.println("valor retornado ->>>>>>>>>>>> " + returnValue);
+    }
+
+    @ReactMethod
+    public void writeToNFCCard(int slot, Promise promise) {
+        String info = "teste_com16bytes";
+        byte[] infoBytes = info.getBytes();
+
+        PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
+        dataCard.setStartSlot(slot);
+        dataCard.setEndSlot(slot);
+        dataCard.getSlots()[slot].put("data", infoBytes);
+
+        PlugPagNFCResult result = plugPag.writeToNFCCard(dataCard);
+        int resultado = result.getResult();
+        promise.resolve(resultado);
     }
 
 }

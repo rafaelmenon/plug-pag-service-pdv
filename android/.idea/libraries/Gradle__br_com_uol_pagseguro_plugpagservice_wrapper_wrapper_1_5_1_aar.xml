@@ -1,8 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.5.1@aar">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/18ad06265aee4cd1443ee31f0c258fcc/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/18ad06265aee4cd1443ee31f0c258fcc/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7edbe9166529864f1b3f31d6549d6dc4/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7edbe9166529864f1b3f31d6549d6dc4/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7edbe9166529864f1b3f31d6549d6dc4/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
