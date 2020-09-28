@@ -1,5 +1,6 @@
 package com.reactlibrary;
 
+import android.app.AlertDialog;
 import android.os.Build;
 import android.util.Log;
 
@@ -25,6 +26,8 @@ import java.util.concurrent.Future;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagActivationData;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAppIdentification;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventData;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventListener;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagInitializationResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagNFCResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagNearFieldCardData;
@@ -146,9 +149,53 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         }
     }
 
+//    @ReactMethod
+//    public void doPayment(String jsonStr, Promise promise) {
+//        final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
+//
+//        ExecutorService executor = Executors.newSingleThreadExecutor();
+//        Callable<PlugPagTransactionResult> callable = new Callable<PlugPagTransactionResult>() {
+//            @Override
+//            public PlugPagTransactionResult call() throws Exception {
+//                return plugPag.doPayment(paymentData);
+//            }
+//        };
+//
+//        Future<PlugPagTransactionResult> future = executor.submit(callable);
+//        executor.shutdown();
+//
+//        try {
+//            PlugPagTransactionResult transactionResult = future.get();
+//
+//            final WritableMap map = Arguments.createMap();
+//            map.putInt("retCode", transactionResult.getResult());
+//
+//            promise.resolve(map);
+//        } catch (ExecutionException e) {
+//            Log.d("PlugPag", e.getMessage());
+//            promise.reject("error", e.getMessage());
+//        } catch (InterruptedException e) {
+//            Log.d("PlugPag", e.getMessage());
+//            promise.reject("error", e.getMessage());
+//        }
+//    }
+
     @ReactMethod
     public void doPayment(String jsonStr, Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(getCurrentActivity());
+
+        plugPag.setEventListener(new PlugPagEventListener() {
+            @Override
+            public void onEvent(PlugPagEventData plugPagEventData) {
+                String message = plugPagEventData.getCustomMessage();
+                builder1.setMessage(message);
+                builder1.setCancelable(true);
+                AlertDialog alert11 = builder1.create();
+                alert11.show();
+            }
+        });
+
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Callable<PlugPagTransactionResult> callable = new Callable<PlugPagTransactionResult>() {
@@ -160,6 +207,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
         Future<PlugPagTransactionResult> future = executor.submit(callable);
         executor.shutdown();
+
 
         try {
             PlugPagTransactionResult transactionResult = future.get();
@@ -175,6 +223,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             Log.d("PlugPag", e.getMessage());
             promise.reject("error", e.getMessage());
         }
+
     }
 
     /*Método para pegar o serial do pos*/
