@@ -149,58 +149,27 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         }
     }
 
-//    @ReactMethod
-//    public void doPayment(String jsonStr, Promise promise) {
-//        final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
-//
-//        ExecutorService executor = Executors.newSingleThreadExecutor();
-//        Callable<PlugPagTransactionResult> callable = new Callable<PlugPagTransactionResult>() {
-//            @Override
-//            public PlugPagTransactionResult call() throws Exception {
-//                return plugPag.doPayment(paymentData);
-//            }
-//        };
-//
-//        Future<PlugPagTransactionResult> future = executor.submit(callable);
-//        executor.shutdown();
-//
-//        try {
-//            PlugPagTransactionResult transactionResult = future.get();
-//
-//            final WritableMap map = Arguments.createMap();
-//            map.putInt("retCode", transactionResult.getResult());
-//
-//            promise.resolve(map);
-//        } catch (ExecutionException e) {
-//            Log.d("PlugPag", e.getMessage());
-//            promise.reject("error", e.getMessage());
-//        } catch (InterruptedException e) {
-//            Log.d("PlugPag", e.getMessage());
-//            promise.reject("error", e.getMessage());
-//        }
-//    }
-
     @ReactMethod
     public void doPayment(String jsonStr, Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
         final AlertDialog.Builder builder1 = new AlertDialog.Builder(getCurrentActivity());
+        final AlertDialog alert = builder1.create();
 
         plugPag.setEventListener(new PlugPagEventListener() {
             @Override
             public void onEvent(PlugPagEventData plugPagEventData) {
                 String message = plugPagEventData.getCustomMessage();
-                builder1.setMessage(message);
-                builder1.setCancelable(true);
-                AlertDialog alert11 = builder1.create();
-                alert11.show();
+                alert.setMessage(message);
+                alert.setCancelable(true);
+                alert.show();
             }
         });
-
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Callable<PlugPagTransactionResult> callable = new Callable<PlugPagTransactionResult>() {
             @Override
             public PlugPagTransactionResult call() throws Exception {
+
                 return plugPag.doPayment(paymentData);
             }
         };
@@ -208,13 +177,11 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         Future<PlugPagTransactionResult> future = executor.submit(callable);
         executor.shutdown();
 
-
         try {
             PlugPagTransactionResult transactionResult = future.get();
 
             final WritableMap map = Arguments.createMap();
             map.putInt("retCode", transactionResult.getResult());
-
             promise.resolve(map);
         } catch (ExecutionException e) {
             Log.d("PlugPag", e.getMessage());
@@ -223,7 +190,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             Log.d("PlugPag", e.getMessage());
             promise.reject("error", e.getMessage());
         }
-
     }
 
     /*Método para pegar o serial do pos*/
@@ -232,15 +198,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         String deviceSerial = (String) Build.class.getField("SERIAL").get(null);
         promise.resolve(deviceSerial);
     }
-
-    /* Método temporário para o pos */
-    @ReactMethod
-    public void temporaryReadNFC(int slot, Promise promise) {
-        System.out.println("slot passado ->>>>>" + slot);
-        String identification = "4549430934564676";
-        promise.resolve(identification);
-    }
-
 
     /* Método para ler o cartão*/
     @ReactMethod
@@ -254,18 +211,16 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void writeToNFCCard(int slot, Promise promise) {
-        String info = "teste_com16bytes";
-        byte[] infoBytes = info.getBytes();
+    public void writeToNFCCard(int slot, String info, Promise promise) {
+        byte[] bytes = info.getBytes();
 
         PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
         dataCard.setStartSlot(slot);
         dataCard.setEndSlot(slot);
-        dataCard.getSlots()[slot].put("data", infoBytes);
+        dataCard.getSlots()[slot].put("data", bytes);
 
         PlugPagNFCResult result = plugPag.writeToNFCCard(dataCard);
-        int resultado = result.getResult();
-        promise.resolve(resultado);
+        int returnResult = result.getResult();
+        promise.resolve(returnResult);
     }
-
 }
