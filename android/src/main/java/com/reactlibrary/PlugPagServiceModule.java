@@ -2,6 +2,7 @@ package com.reactlibrary;
 
 import android.app.AlertDialog;
 import android.os.Build;
+import android.util.Base64;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -13,6 +14,7 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.WritableMap;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -199,9 +201,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         promise.resolve(deviceSerial);
     }
 
-    /* Método para ler o cartão*/
+    /* Método para ler ID do cartão*/
     @ReactMethod
-    public void readNFCCard(int slot, Promise promise) throws UnsupportedEncodingException {
+    public void readNFCCardClean(int slot, Promise promise) throws UnsupportedEncodingException {
         PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
         dataCard.setStartSlot(slot);
         dataCard.setEndSlot(slot);
@@ -210,14 +212,45 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         promise.resolve(returnValue);
     }
 
+    /* Método para escrever ID no cartão*/
     @ReactMethod
-    public void writeToNFCCard(int slot, String info, Promise promise) {
+    public void writeToNFCCardClean(int slot, String info, Promise promise) {
         byte[] bytes = info.getBytes();
 
         PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
         dataCard.setStartSlot(slot);
         dataCard.setEndSlot(slot);
         dataCard.getSlots()[slot].put("data", bytes);
+
+        PlugPagNFCResult result = plugPag.writeToNFCCard(dataCard);
+        int returnResult = result.getResult();
+        promise.resolve(returnResult);
+    }
+
+    /* Método para ler qualquer slot do cartão com hash*/
+    @ReactMethod
+    public void readNFCCard(int slot, Promise promise) throws UnsupportedEncodingException {
+        PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
+        dataCard.setStartSlot(slot);
+        dataCard.setEndSlot(slot);
+        PlugPagNFCResult result = plugPag.readFromNFCCard(dataCard);
+        String returnValue = new String(result.getSlots()[result.getStartSlot()].get("data"), "UTF-8");
+        byte[] data2 = Base64.decode(returnValue, Base64.DEFAULT);
+        String text = new String(data2, StandardCharsets.UTF_8);
+        promise.resolve(text);
+    }
+
+    /* Método para escrever qualquer slot do cartão com hash*/
+    @ReactMethod
+    public void writeToNFCCard(int slot, String info, Promise promise) throws UnsupportedEncodingException {
+        byte[] bytes = info.getBytes("UTF-8");
+        String base64 = Base64.encodeToString(bytes, Base64.DEFAULT);
+        byte[] bytesWrite = base64.getBytes("UTF-8");
+
+        PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
+        dataCard.setStartSlot(slot);
+        dataCard.setEndSlot(slot);
+        dataCard.getSlots()[slot].put("data", bytesWrite);
 
         PlugPagNFCResult result = plugPag.writeToNFCCard(dataCard);
         int returnResult = result.getResult();
