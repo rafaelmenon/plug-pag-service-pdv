@@ -41,6 +41,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
     private PlugPagAppIdentification appIdentification;
     private PlugPag plugPag;
+    private int countPassword = 0;
 
     public PlugPagServiceModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -161,6 +162,33 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             @Override
             public void onEvent(PlugPagEventData plugPagEventData) {
                 String message = plugPagEventData.getCustomMessage();
+                if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD || plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
+
+                    if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD) {
+                        countPassword++;
+                    } else if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
+                        countPassword = 0;
+                    }
+
+                    if (countPassword == 0 ) {
+                        message = "Senha:";
+                    } else if (countPassword == 1) {
+                        message = "Senha: *";
+                    } else if (countPassword == 2) {
+                        message = "Senha: **";
+                    } else if (countPassword == 3) {
+                        message = "Senha: ***";
+                    } else if (countPassword == 4) {
+                        message = "Senha: ****";
+                    } else if (countPassword == 5) {
+                        message = "Senha: *****";
+                    } else if (countPassword == 6) {
+                        message = "Senha: ******";
+                    } else if (countPassword > 6) {
+                        message = "Senha: ******";
+                    }
+                }
+
                 alert.setMessage(message);
                 alert.setCancelable(true);
                 alert.show();
@@ -172,7 +200,14 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             @Override
             public PlugPagTransactionResult call() throws Exception {
 
-                return plugPag.doPayment(paymentData);
+                return plugPag.doPayment(
+                        new PlugPagPaymentData(
+                                paymentData.component1(),
+                                paymentData.component2(),
+                                paymentData.component3(),
+                                paymentData.component4(),
+                                paymentData.component5(),
+                                true));
             }
         };
 
