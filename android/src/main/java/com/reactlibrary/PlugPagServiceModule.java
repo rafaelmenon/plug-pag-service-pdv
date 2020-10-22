@@ -42,6 +42,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private PlugPagAppIdentification appIdentification;
     private PlugPag plugPag;
     private int countPassword = 0;
+    private AlertDialog.Builder builder1;
 
     public PlugPagServiceModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -155,13 +156,12 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void doPayment(String jsonStr, Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
-        final AlertDialog.Builder builder1 = new AlertDialog.Builder(getCurrentActivity());
-        final AlertDialog alert = builder1.create();
 
         plugPag.setEventListener(new PlugPagEventListener() {
             @Override
             public void onEvent(PlugPagEventData plugPagEventData) {
                 String message = plugPagEventData.getCustomMessage();
+
                 if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD || plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
 
                     if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD) {
@@ -189,9 +189,17 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     }
                 }
 
+                builder1 = new AlertDialog.Builder(getCurrentActivity());
+                final AlertDialog alert = builder1.create();
                 alert.setMessage(message);
-                alert.setCancelable(true);
                 alert.show();
+
+                new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            alert.cancel();
+                        }
+                    }, 4000);
             }
         });
 
