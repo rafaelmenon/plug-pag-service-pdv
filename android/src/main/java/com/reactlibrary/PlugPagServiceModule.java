@@ -34,6 +34,9 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagInitializationResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagNFCResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagNearFieldCardData;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPaymentData;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrintResult;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrinterData;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrinterListener;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagTransactionResult;
 
 public class PlugPagServiceModule extends ReactContextBaseJavaModule {
@@ -298,5 +301,28 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         PlugPagNFCResult result = plugPag.writeToNFCCard(dataCard);
         int returnResult = result.getResult();
         promise.resolve(returnResult);
+    }
+
+    @ReactMethod
+    public void printFile(String path, Promise promise) {
+        PlugPagPrinterData data = new PlugPagPrinterData(path, 4, 10 * 12);
+
+        PlugPagPrinterListener listener = new PlugPagPrinterListener() {
+            @Override
+            public void onError(PlugPagPrintResult plugPagPrintResult) {
+                System.out.println("erro ->" + plugPagPrintResult.getMessage());
+            }
+
+            @Override
+            public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
+                System.out.println("sucesso ->" + plugPagPrintResult.getMessage());
+            }
+        };
+
+        plugPag.setPrinterListener(listener);
+
+        PlugPagPrintResult result = plugPag.printFromFile(data);
+
+        System.out.println("resultado ->>" + result.getMessage());
     }
 }
