@@ -2,6 +2,7 @@ package com.reactlibrary;
 
 import android.app.AlertDialog;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 
@@ -10,13 +11,15 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.WritableMap;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -26,6 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAbortResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagActivationData;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAppIdentification;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventData;
@@ -304,18 +308,53 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printFile(String path, Promise promise) {
-        PlugPagPrinterData data = new PlugPagPrinterData(path, 4, 10 * 12);
+    public void cancelOperation(Promise promise) {
+        PlugPagAbortResult result = plugPag.abort();
+        promise.resolve(result.getResult());
+    }
+
+
+    public void copyFile(String path) throws IOException {
+        File source = new File(String.valueOf(reactContext.getCacheDir().getAbsoluteFile()) + "/" + path);
+        File dest = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + path);
+
+        if (dest.exists())
+            dest.delete();
+
+        FileChannel sourceChannel = null;
+        FileChannel destinationChannel = null;
+
+        try {
+            sourceChannel = new FileInputStream(source).getChannel();
+            destinationChannel = new FileOutputStream(dest).getChannel();
+            sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
+        } finally {
+            if (sourceChannel != null && sourceChannel.isOpen())
+                sourceChannel.close();
+            if (destinationChannel != null && destinationChannel.isOpen())
+                destinationChannel.close();
+        }
+
+        return;
+    }
+
+    @ReactMethod
+    public void printFile(String path, Promise promise) throws IOException {
+        copyFile(path);
+
+        final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + path, 4, 10 * 12);
+
+        File dest = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + path);
 
         PlugPagPrinterListener listener = new PlugPagPrinterListener() {
             @Override
             public void onError(PlugPagPrintResult plugPagPrintResult) {
-                System.out.println("erro ->" + plugPagPrintResult.getMessage());
+//                System.out.println("erro ->" + plugPagPrintResult.getMessage());
             }
 
             @Override
             public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
-                System.out.println("sucesso ->" + plugPagPrintResult.getMessage());
+//                System.out.println("sucesso ->" + plugPagPrintResult.getMessage());
             }
         };
 
@@ -323,6 +362,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
         PlugPagPrintResult result = plugPag.printFromFile(data);
 
-        System.out.println("resultado ->>" + result.getMessage());
+        dest.delete();
+
+        promise.resolve(result.getErrorCode());
     }
 }
