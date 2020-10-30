@@ -1,6 +1,7 @@
 package com.reactlibrary;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Base64;
@@ -161,16 +162,15 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void doPayment(String jsonStr, Promise promise) {
+    public void doPayment(String jsonStr, final Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
 
         plugPag.setEventListener(new PlugPagEventListener() {
             @Override
-            public void onEvent(PlugPagEventData plugPagEventData) {
+            public void onEvent(final PlugPagEventData plugPagEventData) {
                 String message = plugPagEventData.getCustomMessage();
 
                 if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD || plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
-
                     if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD) {
                         countPassword++;
                     } else if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
@@ -196,17 +196,43 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     }
                 }
 
-                builder1 = new AlertDialog.Builder(getCurrentActivity());
-                final AlertDialog alert = builder1.create();
-                alert.setMessage(message);
-                alert.show();
+                if (plugPagEventData.getEventCode() == 0) {
+                    builder1 = new AlertDialog.Builder(getCurrentActivity());
+                    final AlertDialog alert = builder1.create();
+                    alert.setMessage("INSIRA O CARTÃO");
+                    alert.show();
 
-                new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            alert.cancel();
-                        }
-                    }, 4000);
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    alert.cancel();
+                                }
+                            }, 30000);
+                } else if (plugPagEventData.getEventCode() == 7) {
+                    builder1 = new AlertDialog.Builder(getCurrentActivity());
+                    final AlertDialog alert = builder1.create();
+                    alert.setMessage("RETIRE O CARTÃO");
+                    alert.show();
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    alert.cancel();
+                                }
+                            }, 30000);
+                } else {
+                    builder1 = new AlertDialog.Builder(getCurrentActivity());
+                    final AlertDialog alert = builder1.create();
+                    alert.setMessage(message);
+                    alert.show();
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    alert.cancel();
+                                }
+                            }, 4000);
+                }
             }
         });
 
@@ -214,15 +240,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         Callable<PlugPagTransactionResult> callable = new Callable<PlugPagTransactionResult>() {
             @Override
             public PlugPagTransactionResult call() throws Exception {
-
-                return plugPag.doPayment(
-                        new PlugPagPaymentData(
-                                paymentData.component1(),
-                                paymentData.component2(),
-                                paymentData.component3(),
-                                paymentData.component4(),
-                                paymentData.component5(),
-                                true));
+                return plugPag.doPayment(paymentData);
             }
         };
 
@@ -234,6 +252,13 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
             final WritableMap map = Arguments.createMap();
             map.putInt("retCode", transactionResult.getResult());
+            map.putString("transactionCode", transactionResult.getTransactionCode());
+            map.putString("transactionId", transactionResult.getTransactionId());
+            map.putString("cardBrand", transactionResult.getCardBrand());
+            map.putString("amount", transactionResult.getAmount());
+            map.putString("type", transactionResult.getLabel());
+            map.putString("holderName", transactionResult.getHolderName());
+
             promise.resolve(map);
         } catch (ExecutionException e) {
             Log.d("PlugPag", e.getMessage());
@@ -308,9 +333,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void cancelOperation(Promise promise) {
-        PlugPagAbortResult result = plugPag.abort();
-        promise.resolve(result.getResult());
+    public void cancelOperation() {
+        plugPag.abort();
     }
 
 
@@ -339,7 +363,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printFile(String path, Promise promise) throws IOException {
+    public void printFile(String path, final Promise promise) throws IOException {
         copyFile(path);
 
         final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + path, 4, 10 * 12);
@@ -349,21 +373,27 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         PlugPagPrinterListener listener = new PlugPagPrinterListener() {
             @Override
             public void onError(PlugPagPrintResult plugPagPrintResult) {
-//                System.out.println("erro ->" + plugPagPrintResult.getMessage());
+                builder1 = new AlertDialog.Builder(getCurrentActivity());
+                builder1.setNegativeButton("FECHAR", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+                final AlertDialog alert = builder1.create();
+                alert.setMessage(plugPagPrintResult.getMessage());
+                alert.show();
+
+                promise.reject("error", plugPagPrintResult.getMessage());
             }
 
             @Override
             public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
-//                System.out.println("sucesso ->" + plugPagPrintResult.getMessage());
+                promise.resolve(plugPagPrintResult.getMessage());
             }
         };
 
         plugPag.setPrinterListener(listener);
-
         PlugPagPrintResult result = plugPag.printFromFile(data);
-
         dest.delete();
-
-        promise.resolve(result.getErrorCode());
     }
 }

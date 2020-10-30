@@ -32,8 +32,9 @@ public class JsonParseUtils {
             int installments = object.getInt("installments");
             int type = object.getInt("type");
             String userReference = object.getString("userReference");
+            Boolean printReceipt = object.getBoolean("printReceipt");
 
-            PlugPagPaymentData paymentData = new PlugPagPaymentData(type, amount, installmentType, installments, userReference);
+            PlugPagPaymentData paymentData = new PlugPagPaymentData(type, amount, installmentType, installments, userReference, printReceipt);
             Log.d("PlugPag Json Parse", "PlugPagPaymentData parse success");
 
             return paymentData;
