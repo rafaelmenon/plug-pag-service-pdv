@@ -368,7 +368,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     public void printFile(String path, final Promise promise) throws IOException {
         copyFile(path);
 
-        final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + path, 4, 10 * 12);
+        final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + path, 1, 10 * 12);
 
         File dest = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + path);
 
