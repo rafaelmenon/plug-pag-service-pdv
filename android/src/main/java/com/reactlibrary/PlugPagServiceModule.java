@@ -1,7 +1,10 @@
 package com.reactlibrary;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Base64;
@@ -61,7 +64,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     public String getName() {
         return "PlugPagService";
     }
-
 
     @Override
     public Map<String, Object> getConstants() {
@@ -395,5 +397,14 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         plugPag.setPrinterListener(listener);
         PlugPagPrintResult result = plugPag.printFromFile(data);
         dest.delete();
+    }
+
+    @ReactMethod
+    public void connection(Promise promise) {
+        ConnectivityManager conn = (ConnectivityManager)reactContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = conn.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        int connected = isConnected == true ? 1 : 0;
+        promise.resolve(connected);
     }
 }
