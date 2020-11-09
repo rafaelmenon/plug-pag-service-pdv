@@ -13,6 +13,7 @@ import android.util.Log;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
@@ -32,6 +33,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import javax.annotation.Nullable;
 
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAbortResult;
@@ -55,6 +58,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private PlugPag plugPag;
     private int countPassword = 0;
     private AlertDialog.Builder builder1;
+    WritableMap params = Arguments.createMap();
 
 
     public PlugPagServiceModule(ReactApplicationContext reactContext) {
@@ -401,16 +405,20 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         dest.delete();
     }
 
+    private void sendEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("connectionEvent", params);
+    }
+
     @ReactMethod
-    public void connection(Promise promise) {
+    public void connection() {
         ConnectivityManager conn = (ConnectivityManager)reactContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = conn.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         String connected = isConnected == true ? "Online" : "Offline";
 
-        WritableMap params = Arguments.createMap();
+
         params.putString("status", connected);
 
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("connectionEvent", params);
+        sendEvent(reactContext, "connectionEvent", params);
     }
 }
