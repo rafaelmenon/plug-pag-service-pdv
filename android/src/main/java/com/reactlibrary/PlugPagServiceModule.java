@@ -56,6 +56,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private int countPassword = 0;
     private AlertDialog.Builder builder1;
 
+
     public PlugPagServiceModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
@@ -405,8 +406,11 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         ConnectivityManager conn = (ConnectivityManager)reactContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = conn.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        int connected = isConnected == true ? 1 : 0;
+        String connected = isConnected == true ? "Online" : "Offline";
 
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("connectionEvent", connected);
+        WritableMap params = Arguments.createMap();
+        params.putString("status", connected);
+
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("connectionEvent", params);
     }
 }
