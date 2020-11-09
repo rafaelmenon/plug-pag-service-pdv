@@ -405,7 +405,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         dest.delete();
     }
 
-    private void sendEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params) {
+    private void sendEvent(ReactContext reactContext, String eventName, @Nullable String params) {
         reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("connectionEvent", params);
     }
 
@@ -416,9 +416,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
         String connected = isConnected == true ? "Online" : "Offline";
 
-
-        params.putString("status", connected);
-
-        sendEvent(reactContext, "connectionEvent", params);
+        sendEvent(reactContext, "connectionEvent", connected);
     }
 }
