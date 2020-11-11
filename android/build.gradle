@@ -69,6 +69,7 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'  // From node_modules
     // plug pag service
     implementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.5.1'
+    implementation files('libs/BluetoothPrinterPlugin.jar')
 }
 
 def configureReactNativePom(def pom) {

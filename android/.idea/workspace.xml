@@ -20,7 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5cf308ba-4d35-4728-8b12-2f1776d4373d" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle____libs_BluetoothPrinterPlugin_jar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android.iml" beforeDir="false" afterPath="$PROJECT_DIR$/android.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/reactlibrary/PlugPagServiceModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/reactlibrary/PlugPagServiceModule.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -47,16 +52,6 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>public const final val</find>
-      <find>/* compiled code */</find>
-      <find>kotlin.</find>
-      <find>//</find>
-      <find>PlugPag.RET_OK</find>
-      <find>initializeAndActivatePinpad</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
@@ -70,7 +65,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="android.sdk.path" value="E:/android/android_sdk" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Dependencies" />
+    <property name="project.structure.last.edited" value="Suggestions" />
     <property name="project.structure.proportion" value="0.17" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
@@ -107,14 +102,26 @@
     </todo-panel>
   </component>
   <component name="WindowStateProjectService">
+    <state x="2422" y="386" width="950" height="537" key="#PSD" timestamp="1605104888939">
+      <screen x="1920" y="98" width="1920" height="1080" />
+    </state>
+    <state x="2422" y="386" width="950" height="537" key="#PSD/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605104888939" />
     <state x="2635" y="409" width="524" height="491" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog" timestamp="1603738870917">
       <screen x="1920" y="98" width="1920" height="1080" />
     </state>
     <state x="2635" y="409" width="524" height="491" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1603738870917" />
-    <state x="2663" y="294" width="424" height="491" key="FileChooserDialogImpl" timestamp="1604942648618">
+    <state x="2663" y="294" width="424" height="491" key="FileChooserDialogImpl" timestamp="1605105856766">
       <screen x="1920" y="98" width="1920" height="1080" />
     </state>
     <state x="743" y="275" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@0.125.1920.955" timestamp="1603744341682" />
-    <state x="2663" y="294" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1604942648618" />
+    <state x="2663" y="294" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605105856766" />
+    <state x="2391" y="286" width="1022" height="737" key="SettingsEditor" timestamp="1605104811410">
+      <screen x="1920" y="98" width="1920" height="1080" />
+    </state>
+    <state x="2391" y="286" width="1022" height="737" key="SettingsEditor/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605104811410" />
+    <state x="2587" y="523" width="648" height="307" key="psd.add.jar.dependency.panel.dimension" timestamp="1605104877448">
+      <screen x="1920" y="98" width="1920" height="1080" />
+    </state>
+    <state x="2587" y="523" width="648" height="307" key="psd.add.jar.dependency.panel.dimension/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605104877448" />
   </component>
 </project>

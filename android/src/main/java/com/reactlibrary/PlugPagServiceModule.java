@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
+import android.graphics.BitmapFactory;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -18,6 +19,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.okgames.bprinterplugin.PrintPicture;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -292,7 +294,12 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         dataCard.setEndSlot(slot);
         PlugPagNFCResult result = plugPag.readFromNFCCard(dataCard);
         String returnValue = new String(result.getSlots()[result.getStartSlot()].get("data"), "UTF-8");
-        promise.resolve(returnValue);
+
+        if (result.getResult() == -1) {
+            promise.resolve(null);
+        } else {
+            promise.resolve(returnValue);
+        }
     }
 
     /* Método para escrever ID no cartão*/
