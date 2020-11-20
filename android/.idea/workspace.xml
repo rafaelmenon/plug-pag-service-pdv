@@ -20,13 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5cf308ba-4d35-4728-8b12-2f1776d4373d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Gradle____libs_BluetoothPrinterPlugin_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/5.1.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android.iml" beforeDir="false" afterPath="$PROJECT_DIR$/android.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/reactlibrary/PlugPagServiceModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/reactlibrary/PlugPagServiceModule.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,11 +106,11 @@
       <screen x="1920" y="98" width="1920" height="1080" />
     </state>
     <state x="2635" y="409" width="524" height="491" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1603738870917" />
-    <state x="2663" y="294" width="424" height="491" key="FileChooserDialogImpl" timestamp="1605105856766">
-      <screen x="1920" y="98" width="1920" height="1080" />
+    <state x="743" y="275" width="424" height="491" key="FileChooserDialogImpl" timestamp="1605300924692">
+      <screen x="0" y="125" width="1920" height="955" />
     </state>
-    <state x="743" y="275" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@0.125.1920.955" timestamp="1603744341682" />
-    <state x="2663" y="294" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605105856766" />
+    <state x="743" y="275" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@0.125.1920.955" timestamp="1605300924692" />
+    <state x="2663" y="294" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605289279832" />
     <state x="2391" y="286" width="1022" height="737" key="SettingsEditor" timestamp="1605104811410">
       <screen x="1920" y="98" width="1920" height="1080" />
     </state>
