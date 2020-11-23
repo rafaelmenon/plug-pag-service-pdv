@@ -179,9 +179,14 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         plugPag.setEventListener(new PlugPagEventListener() {
             @Override
             public void onEvent(final PlugPagEventData plugPagEventData) {
+                WritableMap params = Arguments.createMap();
                 String message = plugPagEventData.getCustomMessage();
+                int code = plugPagEventData.getEventCode();
 
-                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", message);
+                params.putString("message", message);
+                params.putInt("code", code);
+
+                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", params);
             }
         });
 
@@ -191,7 +196,12 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 PlugPagTransactionResult transactionResult = plugPag.doPayment(paymentData);
-                promise.resolve(transactionResult.getResult());
+                if (transactionResult.getResult() == 1) {
+                    promise.resolve(transactionResult.getResult());
+                } else {
+                    promise.reject("error");
+                }
+//                promise.resolve(transactionResult.getResult());
             }
         };
 
@@ -274,11 +284,15 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
     public void print(String path) {
         final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + path, 4, 10 * 12);
+        final AlertDialog.Builder builder1 = new AlertDialog.Builder(getCurrentActivity());
+        final AlertDialog alert = builder1.create();
 
         PlugPagPrinterListener listener = new PlugPagPrinterListener() {
             @Override
             public void onError(PlugPagPrintResult plugPagPrintResult) {
-                System.out.println("ERRO DE IMRPESSAO" + plugPagPrintResult.getMessage());
+                alert.setMessage(plugPagPrintResult.getMessage());
+                alert.setCancelable(true);
+                alert.show();
             }
 
             @Override
@@ -290,7 +304,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         plugPag.setPrinterListener(listener);
 
         PlugPagPrintResult result = plugPag.printFromFile(data);
-        System.out.println("MENSAGEM ->>>" + result.getMessage());
+        return;
     }
 
     @ReactMethod
@@ -301,9 +315,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
         for (File fileTmp : arquivos) {
             print(fileTmp.getName());
+            fileTmp.delete();
         }
-
-        promise.resolve(null);
     }
 
 
