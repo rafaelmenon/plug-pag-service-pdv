@@ -59,7 +59,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
     private PlugPagAppIdentification appIdentification;
     private PlugPag plugPag;
-    private int countPassword = 0;
+    private int countPrint = 0;
+    private int countImages = 0;
+    private boolean success = false;
     private AlertDialog.Builder builder1;
     WritableMap params = Arguments.createMap();
 
@@ -196,12 +198,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 PlugPagTransactionResult transactionResult = plugPag.doPayment(paymentData);
-                if (transactionResult.getResult() == 1) {
-                    promise.resolve(transactionResult.getResult());
-                } else {
-                    promise.reject("error");
-                }
-//                promise.resolve(transactionResult.getResult());
+                final WritableMap map = Arguments.createMap();
+                map.putInt("retCode", transactionResult.getResult());
+                promise.resolve(map);
             }
         };
 
@@ -297,7 +296,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
             @Override
             public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
-                System.out.println("SUCESSO DE IMPRESSAO" + plugPagPrintResult.getMessage());
+                countPrint++;
             }
         };
 
@@ -310,15 +309,40 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printFile(final Promise promise) throws IOException {
         setAppIdendification("pdv365", "0.0.1");
+        countPrint = 0;
         File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print");
         File[] arquivos = file.listFiles();
+        countImages = arquivos.length;
 
         for (File fileTmp : arquivos) {
-            print(fileTmp.getName());
-            fileTmp.delete();
-        }
-    }
 
+            final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
+            final AlertDialog.Builder builder1 = new AlertDialog.Builder(getCurrentActivity());
+            final AlertDialog alert = builder1.create();
+
+            PlugPagPrinterListener listener = new PlugPagPrinterListener() {
+                @Override
+                public void onError(PlugPagPrintResult plugPagPrintResult) {
+                    alert.setMessage(plugPagPrintResult.getMessage());
+                    alert.setCancelable(true);
+                    alert.show();
+                }
+
+                @Override
+                public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
+                    countPrint++;
+                    if (countPrint == countImages) {
+                        promise.resolve(null);
+                    }
+                }
+            };
+
+            plugPag.setPrinterListener(listener);
+
+            PlugPagPrintResult result = plugPag.printFromFile(data);
+        }
+
+    }
 
     private void sendEvent(ReactContext reactContext, String eventName, @Nullable boolean params) {
         reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("connectionEvent", params);
