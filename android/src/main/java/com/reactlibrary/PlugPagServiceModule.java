@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
-import android.graphics.BitmapFactory;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -21,13 +20,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +34,6 @@ import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag;
-import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAbortResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagActivationData;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagAppIdentification;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventData;
@@ -61,7 +54,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private PlugPag plugPag;
     private int countPrint = 0;
     private int countImages = 0;
+    private String messageCard = null;
     private boolean success = false;
+    private int countPassword = 0;
     private AlertDialog.Builder builder1;
     WritableMap params = Arguments.createMap();
 
@@ -175,20 +170,55 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getMessages(Promise promise) {
+        promise.resolve(messageCard);
+    }
+
+    @ReactMethod
     public void doPayment(String jsonStr, final Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
 
         plugPag.setEventListener(new PlugPagEventListener() {
             @Override
             public void onEvent(final PlugPagEventData plugPagEventData) {
-                WritableMap params = Arguments.createMap();
-                String message = plugPagEventData.getCustomMessage();
+                messageCard = plugPagEventData.getCustomMessage();
                 int code = plugPagEventData.getEventCode();
 
-                params.putString("message", message);
-                params.putInt("code", code);
+                if (code == PlugPagEventData.EVENT_CODE_WAITING_CARD) {
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                } else if (code == PlugPagEventData.EVENT_CODE_PIN_REQUESTED) {
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                } else if (code == PlugPagEventData.EVENT_CODE_WAITING_REMOVE_CARD) {
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                } else if (code == PlugPagEventData.EVENT_CODE_SALE_APPROVED) {
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                } else if (code == PlugPagEventData.EVENT_CODE_SALE_NOT_APPROVED) {
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                } else if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD || plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
+                    if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD) {
+                        countPassword++;
+                    } else if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
+                        countPassword = 0;
+                    }
 
-                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", params);
+                    if (countPassword == 0 ) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha:");
+                    } else if (countPassword == 1) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: *");
+                    } else if (countPassword == 2) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: **");
+                    } else if (countPassword == 3) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: ***");
+                    } else if (countPassword == 4) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: ****");
+                    } else if (countPassword == 5) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: *****");
+                    } else if (countPassword == 6) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: ******");
+                    } else if (countPassword > 6) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: ******");
+                    }
+                }
             }
         });
 
@@ -281,31 +311,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         plugPag.abort();
     }
 
-    public void print(String path) {
-        final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + path, 4, 10 * 12);
-        final AlertDialog.Builder builder1 = new AlertDialog.Builder(getCurrentActivity());
-        final AlertDialog alert = builder1.create();
-
-        PlugPagPrinterListener listener = new PlugPagPrinterListener() {
-            @Override
-            public void onError(PlugPagPrintResult plugPagPrintResult) {
-                alert.setMessage(plugPagPrintResult.getMessage());
-                alert.setCancelable(true);
-                alert.show();
-            }
-
-            @Override
-            public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
-                countPrint++;
-            }
-        };
-
-        plugPag.setPrinterListener(listener);
-
-        PlugPagPrintResult result = plugPag.printFromFile(data);
-        return;
-    }
-
     @ReactMethod
     public void printFile(final Promise promise) throws IOException {
         setAppIdendification("pdv365", "0.0.1");
@@ -317,15 +322,21 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         for (File fileTmp : arquivos) {
 
             final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
-            final AlertDialog.Builder builder1 = new AlertDialog.Builder(getCurrentActivity());
-            final AlertDialog alert = builder1.create();
 
             PlugPagPrinterListener listener = new PlugPagPrinterListener() {
                 @Override
                 public void onError(PlugPagPrintResult plugPagPrintResult) {
+                    builder1 = new AlertDialog.Builder(getCurrentActivity());
+                    builder1.setNegativeButton("FECHAR", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+                    final AlertDialog alert = builder1.create();
                     alert.setMessage(plugPagPrintResult.getMessage());
-                    alert.setCancelable(true);
                     alert.show();
+
+                    promise.reject("error", plugPagPrintResult.getMessage());
                 }
 
                 @Override
@@ -339,7 +350,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
             plugPag.setPrinterListener(listener);
 
-            PlugPagPrintResult result = plugPag.printFromFile(data);
+            plugPag.printFromFile(data);
+            fileTmp.delete();
         }
 
     }
