@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
+import android.content.pm.PackageInfo;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -60,6 +61,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private AlertDialog.Builder builder1;
     WritableMap params = Arguments.createMap();
 
+    private PackageInfo getPackageInfo() throws Exception {
+        return getReactApplicationContext().getPackageManager().getPackageInfo(getReactApplicationContext().getPackageName(), 0);
+    }
 
     public PlugPagServiceModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -126,6 +130,17 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         constants.put("SMART_RECHARGE_SERVICE_PACKAGE_NAME", PlugPag.SMART_RECHARGE_SERVICE_PACKAGE_NAME);
 
         constants.put("RET_OK", PlugPag.RET_OK);
+
+        String appVersion;
+
+        try {
+            appVersion = getPackageInfo().versionName;
+        } catch (Exception e) {
+            appVersion = "unkown";
+        }
+
+        constants.put("appVersion", appVersion);
+
 
         return constants;
     }
