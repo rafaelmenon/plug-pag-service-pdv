@@ -47,6 +47,7 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrintResult;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrinterData;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrinterListener;
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagTransactionResult;
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagVoidData;
 
 public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
@@ -246,6 +247,23 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 final WritableMap map = Arguments.createMap();
                 map.putInt("retCode", transactionResult.getResult());
                 promise.resolve(map);
+            }
+        };
+
+        executor.execute(runnableTask);
+        executor.shutdown();
+    }
+
+    @ReactMethod
+    public void reversePayment(final String code, final String id, final Promise promise) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        Runnable runnableTask = new Runnable() {
+            @Override
+            public void run() {
+                PlugPagTransactionResult transactionResult = plugPag.voidPayment(new PlugPagVoidData(code, id, true));
+                final WritableMap map = Arguments.createMap();
+                map.putInt("retCode", transactionResult.getResult());
             }
         };
 
