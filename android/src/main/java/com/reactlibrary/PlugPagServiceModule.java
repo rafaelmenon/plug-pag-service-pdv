@@ -57,7 +57,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private int countPrint = 0;
     private int countImages = 0;
     private String messageCard = null;
-    private boolean success = false;
     private int countPassword = 0;
     private AlertDialog.Builder builder1;
     WritableMap params = Arguments.createMap();
@@ -346,47 +345,47 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void printFile(final Promise promise) throws IOException {
-        setAppIdendification("pdv365", "0.0.1");
-        countPrint = 0;
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print");
-        File[] arquivos = file.listFiles();
-        countImages = arquivos.length;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        for (File fileTmp : arquivos) {
+        Runnable runnableTask = new Runnable() {
+            @Override
+            public void run() {
+                setAppIdendification("pdv365", "0.0.1");
+                countPrint = 0;
+                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print");
+                File[] arquivos = file.listFiles();
+                countImages = arquivos.length;
 
-            final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
 
-            PlugPagPrinterListener listener = new PlugPagPrinterListener() {
-                @Override
-                public void onError(PlugPagPrintResult plugPagPrintResult) {
-                    builder1 = new AlertDialog.Builder(getCurrentActivity());
-                    builder1.setNegativeButton("FECHAR", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
+                for (File fileTmp : arquivos) {
+
+                    final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
+
+                    PlugPagPrinterListener listener = new PlugPagPrinterListener() {
+                        @Override
+                        public void onError(PlugPagPrintResult plugPagPrintResult) {
+                            promise.reject("error", plugPagPrintResult.getMessage());
                         }
-                    });
-                    final AlertDialog alert = builder1.create();
-                    alert.setMessage(plugPagPrintResult.getMessage());
-                    alert.show();
 
-                    promise.reject("error", plugPagPrintResult.getMessage());
+                        @Override
+                        public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
+                            countPrint++;
+                            if (countPrint == countImages) {
+                                promise.resolve(null);
+                            }
+                        }
+                    };
+
+                    plugPag.setPrinterListener(listener);
+
+                    plugPag.printFromFile(data);
+                    fileTmp.delete();
                 }
+            }
+        };
 
-                @Override
-                public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
-                    countPrint++;
-                    if (countPrint == countImages) {
-                        promise.resolve(null);
-                    }
-                }
-            };
-
-            plugPag.setPrinterListener(listener);
-
-            plugPag.printFromFile(data);
-            fileTmp.delete();
-        }
-
+        executor.execute(runnableTask);
+        executor.shutdown();
     }
 
     private void sendEvent(ReactContext reactContext, String eventName, @Nullable boolean params) {
