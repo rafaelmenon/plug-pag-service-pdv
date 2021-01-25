@@ -202,6 +202,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 if (code == PlugPagEventData.EVENT_CODE_WAITING_CARD) {
                     reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
                 } else if (code == PlugPagEventData.EVENT_CODE_PIN_REQUESTED) {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                } else if (code == PlugPagEventData.EVENT_CODE_CUSTOM_MESSAGE) {
                     reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
                 } else if (code == PlugPagEventData.EVENT_CODE_WAITING_REMOVE_CARD) {
                     reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
