@@ -266,6 +266,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 final WritableMap map = Arguments.createMap();
                 map.putInt("retCode", transactionResult.getResult());
                 map.putString("message", transactionResult.getMessage());
+                promise.resolve(map);
             }
         };
 
