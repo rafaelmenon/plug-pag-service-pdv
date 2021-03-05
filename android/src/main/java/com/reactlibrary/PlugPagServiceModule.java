@@ -257,13 +257,13 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void reprintStablishmentReceipt(Promise promise) {
         PlugPagPrintResult result = plugPag.reprintStablishmentReceipt();
-        promise.resolve(result);
+        promise.resolve(result.getResult());
     }
 
     @ReactMethod
     public void reprintCustomerReceipt(Promise promise) {
         PlugPagPrintResult result = plugPag.reprintCustomerReceipt();
-        promise.resolve(result);
+        promise.resolve(result.getResult());
     }
 
     @ReactMethod
