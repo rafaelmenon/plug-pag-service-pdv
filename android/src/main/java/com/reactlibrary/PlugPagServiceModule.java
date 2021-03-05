@@ -58,8 +58,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private int countImages = 0;
     private String messageCard = null;
     private int countPassword = 0;
-    private AlertDialog.Builder builder1;
-    WritableMap params = Arguments.createMap();
+    private String getPassword = null;
+    private PlugPagTransactionResult result = null;
 
     private PackageInfo getPackageInfo() throws Exception {
         return getReactApplicationContext().getPackageManager().getPackageInfo(getReactApplicationContext().getPackageName(), 0);
@@ -185,11 +185,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getMessages(Promise promise) {
-        promise.resolve(messageCard);
-    }
-
-    @ReactMethod
     public void doPayment(String jsonStr, final Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
 
@@ -199,18 +194,20 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 messageCard = plugPagEventData.getCustomMessage();
                 int code = plugPagEventData.getEventCode();
 
+
                 if (code == PlugPagEventData.EVENT_CODE_WAITING_CARD) {
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", messageCard);
                 } else if (code == PlugPagEventData.EVENT_CODE_PIN_REQUESTED) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
-                } else if (code == PlugPagEventData.EVENT_CODE_CUSTOM_MESSAGE) {
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
-                } else if (code == PlugPagEventData.EVENT_CODE_WAITING_REMOVE_CARD) {
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", messageCard);
+                } else if (code == PlugPagEventData.EVENT_CODE_PIN_OK) {
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", messageCard);
+                } else if (code == PlugPagEventData.EVENT_CODE_REMOVED_CARD) {
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", messageCard);
                 } else if (code == PlugPagEventData.EVENT_CODE_SALE_APPROVED) {
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", messageCard);
                 } else if (code == PlugPagEventData.EVENT_CODE_SALE_NOT_APPROVED) {
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", plugPagEventData.getCustomMessage());
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", messageCard);
+
                 } else if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD || plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
                     if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD) {
                         countPassword++;
@@ -219,22 +216,22 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     }
 
                     if (countPassword == 0 ) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha:");
+                        getPassword = "Senha:";
                     } else if (countPassword == 1) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: *");
+                        getPassword = "Senha: *";
                     } else if (countPassword == 2) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: **");
+                        getPassword = "Senha: **";
                     } else if (countPassword == 3) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: ***");
+                        getPassword = "Senha: ***";
                     } else if (countPassword == 4) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: ****");
+                        getPassword = "Senha: ****";
                     } else if (countPassword == 5) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: *****");
-                    } else if (countPassword == 6) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: ******");
-                    } else if (countPassword > 6) {
-                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", "Senha: ******");
+                        getPassword = "Senha: *****";
+                    } else if (countPassword == 6 || countPassword > 6) {
+                        getPassword = "Senha: ******";
                     }
+
+                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", getPassword);
                 }
             }
         });
@@ -245,14 +242,24 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 PlugPagTransactionResult transactionResult = plugPag.doPayment(paymentData);
-                final WritableMap map = Arguments.createMap();
-                map.putInt("retCode", transactionResult.getResult());
-                promise.resolve(map);
+                promise.resolve("retCode" + transactionResult.getResult());
             }
         };
 
         executor.execute(runnableTask);
         executor.shutdown();
+    }
+
+    @ReactMethod
+    public void reprintStablishmentReceipt(Promise promise) {
+        PlugPagPrintResult result = plugPag.reprintStablishmentReceipt();
+        promise.resolve(result);
+    }
+
+    @ReactMethod
+    public void reprintCustomerReceipt(Promise promise) {
+        PlugPagPrintResult result = plugPag.reprintCustomerReceipt();
+        promise.resolve(result);
     }
 
     @ReactMethod

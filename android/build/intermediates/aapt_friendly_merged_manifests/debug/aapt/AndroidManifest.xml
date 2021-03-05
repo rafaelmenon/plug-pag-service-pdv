@@ -6,8 +6,9 @@
 
     <uses-sdk
         android:minSdkVersion="19"
-        android:targetSdkVersion="29" />
+        android:targetSdkVersion="28" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="br.com.uol.pagseguro.permission.MANAGE_PAYMENTS" />
 
 </manifest>

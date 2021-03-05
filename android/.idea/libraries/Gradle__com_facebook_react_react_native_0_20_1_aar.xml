@@ -4,7 +4,6 @@
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3107edcd5c40c87d4d0a955688917112/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3107edcd5c40c87d4d0a955688917112/AndroidManifest.xml" />
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3107edcd5c40c87d4d0a955688917112/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3107edcd5c40c87d4d0a955688917112/res" />
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3107edcd5c40c87d4d0a955688917112/jars/libs/infer-annotations-1.5.jar!/" />
