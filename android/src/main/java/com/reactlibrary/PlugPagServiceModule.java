@@ -242,7 +242,11 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 PlugPagTransactionResult transactionResult = plugPag.doPayment(paymentData);
-                promise.resolve("retCode" + transactionResult.getResult());
+                final WritableMap map = Arguments.createMap();
+                map.putInt("retCode", transactionResult.getResult());
+                map.putString("transactionCode", transactionResult.getTransactionCode());
+                map.putString("transactionId", transactionResult.getTransactionId());
+                promise.resolve(map);
             }
         };
 
