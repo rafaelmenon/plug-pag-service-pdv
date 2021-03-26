@@ -283,35 +283,53 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
     /* Método para ler ID do cartão*/
     @ReactMethod
-    public void readNFCCardClean(int slot, Promise promise) throws UnsupportedEncodingException {
-        PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
-        dataCard.setStartSlot(slot);
-        dataCard.setEndSlot(slot);
-        PlugPagNFCResult result = plugPag.readFromNFCCard(dataCard);
-        String returnValue = new String(result.getSlots()[result.getStartSlot()].get("data"), "UTF-8");
+    public void readNFCCardClean(final int slot, final Promise promise) throws UnsupportedEncodingException {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        if (result.getResult() == -1) {
-            promise.resolve(null);
-        } else {
-            promise.resolve(returnValue);
-        }
+        Runnable runnableTask = new Runnable() {
+            @Override
+            public void run() {
+                PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
+                dataCard.setStartSlot(slot);
+                dataCard.setEndSlot(slot);
+                PlugPagNFCResult result = plugPag.readFromNFCCard(dataCard);
+                String returnValue = new String(result.getSlots()[result.getStartSlot()].get("data"), StandardCharsets.UTF_8);
+
+                if (result.getResult() == -1) {
+                    promise.resolve(null);
+                } else {
+                    promise.resolve(returnValue);
+                }
+            }
+        };
+
+        executor.execute(runnableTask);
+        executor.shutdown();
     }
 
     /* Método para escrever ID no cartão*/
-    @ReactMethod
-    public void writeToNFCCardClean(int slot, String info, Promise promise) {
-        byte[] bytes = info.getBytes();
+    public void writeToNFCCardClean(final int slot, final String info, final Promise promise) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
-        dataCard.setStartSlot(slot);
-        dataCard.setEndSlot(slot);
-        dataCard.getSlots()[slot].put("data", bytes);
+        Runnable runnableTask = new Runnable() {
+            @Override
+            public void run() {
+                byte[] bytes = info.getBytes();
 
-        PlugPagNFCResult result = plugPag.writeToNFCCard(dataCard);
-        int returnResult = result.getResult();
-        promise.resolve(returnResult);
+                PlugPagNearFieldCardData dataCard = new PlugPagNearFieldCardData();
+                dataCard.setStartSlot(slot);
+                dataCard.setEndSlot(slot);
+                dataCard.getSlots()[slot].put("data", bytes);
+
+                PlugPagNFCResult result = plugPag.writeToNFCCard(dataCard);
+                int returnResult = result.getResult();
+                promise.resolve(returnResult);
+            }
+        };
+
+        executor.execute(runnableTask);
+        executor.shutdown();
     }
-
     /* Método para ler qualquer slot do cartão com hash*/
     @ReactMethod
     public void readNFCCard(int slot, Promise promise) throws UnsupportedEncodingException {
@@ -403,5 +421,16 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         boolean isConnected = activeNetwork != null ? activeNetwork.isConnectedOrConnecting() : false;
 
         sendEvent(reactContext, "connectionEvent", isConnected);
+    }
+
+    @ReactMethod
+    public void cancelReadCard(Promise promise) {
+        PlugPagNFCResult result =  plugPag.abortNFC();
+
+        if (result.getResult() == -1) {
+            promise.reject(null, "Não foi possível cancelar a operação.");
+        } else {
+            promise.resolve(null);
+        }
     }
 }

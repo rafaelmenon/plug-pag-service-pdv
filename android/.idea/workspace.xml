@@ -63,7 +63,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="android.sdk.path" value="E:/android/android_sdk" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="memory.settings.postsync.last.time.stamp" value="1614005565767" />
+    <property name="memory.settings.postsync.last.time.stamp" value="1616762201227" />
     <property name="project.structure.last.edited" value="Suggestions" />
     <property name="project.structure.proportion" value="0.17" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -101,15 +101,10 @@
     </todo-panel>
   </component>
   <component name="WindowStateProjectService">
-    <state x="2422" y="386" width="950" height="537" key="#PSD" timestamp="1605104888939">
-      <screen x="1920" y="98" width="1920" height="1080" />
-    </state>
-    <state x="2422" y="386" width="950" height="537" key="#PSD/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605104888939" />
-    <state x="2663" y="196" width="424" height="491" key="FileChooserDialogImpl" timestamp="1612806589365">
+    <state x="2663" y="196" width="424" height="491" key="FileChooserDialogImpl" timestamp="1614005935094">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
-    <state x="2663" y="196" width="424" height="491" key="FileChooserDialogImpl/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1612806589365" />
-    <state x="743" y="275" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@0.125.1920.955" timestamp="1605300924692" />
+    <state x="2663" y="196" width="424" height="491" key="FileChooserDialogImpl/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1614005935094" />
     <state x="2663" y="294" width="424" height="491" key="FileChooserDialogImpl/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1606324885383" />
     <state width="1830" height="225" key="GridCell.Tab.0.bottom" timestamp="1611595481745">
       <screen x="1920" y="0" width="1920" height="1080" />
@@ -127,13 +122,5 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state width="1830" height="225" key="GridCell.Tab.0.right/1920.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1611595481745" />
-    <state x="2391" y="286" width="1022" height="737" key="SettingsEditor" timestamp="1605104811410">
-      <screen x="1920" y="98" width="1920" height="1080" />
-    </state>
-    <state x="2391" y="286" width="1022" height="737" key="SettingsEditor/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605104811410" />
-    <state x="2587" y="523" width="648" height="307" key="psd.add.jar.dependency.panel.dimension" timestamp="1605104877448">
-      <screen x="1920" y="98" width="1920" height="1080" />
-    </state>
-    <state x="2587" y="523" width="648" height="307" key="psd.add.jar.dependency.panel.dimension/1920.98.1920.1080/0.125.1920.955@1920.98.1920.1080" timestamp="1605104877448" />
   </component>
 </project>
