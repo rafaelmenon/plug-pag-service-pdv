@@ -319,6 +319,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     /* Método para escrever ID no cartão*/
+    @ReactMethod
     public void writeToNFCCardClean(final int slot, final String info, final Promise promise) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
