@@ -68,7 +68,7 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
     // plug pag service
-    implementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.5.1'
+    implementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.15.0'
     implementation files('libs/BluetoothPrinterPlugin.jar')
 }
 
