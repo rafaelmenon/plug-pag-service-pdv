@@ -450,11 +450,10 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void calculateInstallments(String saleValue, final Promise promise) {
         try {
-            PlugPagAppIdentification appIdentification = new PlugPagAppIdentification("MeuApp", "1.0.7");
-            PlugPag plugpag = new PlugPag(reactContext, appIdentification);
-            String[] installments = plugpag.calculateInstallments(saleValue);
-            WritableArray tmpListInstallments = Arguments.fromList(Arrays.asList(installments));
-            promise.resolve(tmpListInstallments);
+            setAppIdendification("pdv365", "0.0.1");
+            String[] installments = plugPag.calculateInstallments(saleValue);
+            WritableArray nativeArray = Arguments.fromList(Arrays.asList(installments));
+            promise.resolve(nativeArray);
         }
         catch(Exception e){
             promise.reject(e);
