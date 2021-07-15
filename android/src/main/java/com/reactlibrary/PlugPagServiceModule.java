@@ -1,8 +1,13 @@
 package com.reactlibrary;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -20,11 +25,24 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -60,6 +78,17 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private int countPassword = 0;
     private String getPassword = null;
     private PlugPagTransactionResult result = null;
+    private static int lineSpacing = 25;
+    private static int fontSize = 16;
+    private static int align = 0; //0 = esquerda, 1 = centro, 2 = direita
+    private static float sideMarginPercentage = 1; //Em porcentagem
+    private static float topMarginPercentage = 1; //Em porcentagem
+    private static float bottomMarginPercentage = 2; //Em porcentagem
+    private static int width = 340;
+    private static boolean bold = false;
+    private static String breakLineAuxString;
+    private static LinkedList<Piece> pieces;
+    private static String fontFamily = "sans-serif";
 
     private PackageInfo getPackageInfo() throws Exception {
         return getReactApplicationContext().getPackageManager().getPackageInfo(getReactApplicationContext().getPackageName(), 0);
@@ -177,6 +206,308 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             Log.d("PlugPag", e.getMessage());
             promise.reject("error", e.getMessage());
         }
+    }
+
+    private static class Piece {
+        protected int height;
+        protected Paint paint;
+
+        public int getHeight() {
+            return height;
+        }
+
+        public Paint getPaint() {
+            return paint;
+        }
+    }
+
+    public static void initNewImage() {
+        lineSpacing = 25;
+        fontSize = 250;
+        align = 0;
+        sideMarginPercentage = 0;
+        topMarginPercentage = 1;
+        bottomMarginPercentage = 2;
+        width = 1155;
+        bold = false;
+        breakLineAuxString = null;
+
+        pieces = new LinkedList<Piece>();
+    }
+
+    public static void setBold(boolean _bold) {
+        bold = _bold;
+    }
+
+    public static void setLineSpacing(int _lineSpacing) {
+        lineSpacing = _lineSpacing;
+    }
+
+    public static void setFontSize(int _fontSize) {
+        fontSize = _fontSize;
+    }
+
+    public static void setFontFamily(String _fontFamily) {
+        fontFamily = _fontFamily;
+    }
+
+    public static void setAlign(int _align) {
+        align = _align;
+    }
+
+    public static void setSideMarginPercentage(float _sideMarginPercentage) {
+        sideMarginPercentage = _sideMarginPercentage;
+    }
+
+    public static void setTopMarginPercentage(float _topMarginPercentage) {
+        topMarginPercentage = _topMarginPercentage;
+    }
+
+    public static void setBottomMarginPercentage(float _bottomMarginPercentage) {
+        bottomMarginPercentage = _bottomMarginPercentage;
+    }
+
+    public static void setImageWidth(int _width) {
+        width = _width;
+    }
+
+    private static class TextPiece extends Piece {
+        private String text;
+
+        public TextPiece(String _text) {
+            paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(fontSize);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setTypeface(Typeface.create(fontFamily, Typeface.NORMAL));
+            paint.setFakeBoldText(bold);
+
+            if (align == 1) {
+                paint.setTextAlign(Paint.Align.CENTER);
+            } else if (align == 2) {
+                paint.setTextAlign(Paint.Align.RIGHT);
+            } else {
+                paint.setTextAlign(Paint.Align.LEFT);
+            }
+
+            //Calcula se cabe o texto completo sem quebra linha
+            int charactersAmount = paint.breakText(_text, true, width, null);
+
+            if (charactersAmount < _text.length()) {
+                breakLineAuxString = _text.substring(charactersAmount);
+                _text = _text.substring(0, charactersAmount);
+            } else {
+                breakLineAuxString = null;
+            }
+
+            text = _text;
+
+            Rect rectText = new Rect();
+            paint.getTextBounds(text, 0, text.length(), rectText);
+            height = rectText.height() + lineSpacing;
+        }
+
+        public String getText() {
+            return text;
+        }
+    }
+
+    public static void addTextLine(String text) {
+        pieces.add(new TextPiece(text));
+
+        while (breakLineAuxString != null && !breakLineAuxString.isEmpty()) {
+            pieces.add(new TextPiece(breakLineAuxString));
+        }
+    }
+
+    private static class ImagePiece extends Piece {
+        private Bitmap image;
+
+        public ImagePiece(byte[] _imageBytes) {
+            SetImage(BitmapFactory.decodeByteArray(_imageBytes, 0, _imageBytes.length));
+        }
+
+        public ImagePiece(Bitmap _image) {
+            SetImage(_image);
+        }
+
+        private void SetImage (Bitmap _image) {
+            image = _image;
+            height = image.getHeight() + lineSpacing;
+
+            paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+            if (align == 1) {
+                paint.setTextAlign(Paint.Align.CENTER);
+            } else if (align == 2) {
+                paint.setTextAlign(Paint.Align.RIGHT);
+            } else {
+                paint.setTextAlign(Paint.Align.LEFT);
+            }
+        }
+
+        public Bitmap getImage() {
+            return image;
+        }
+    }
+
+    public static void addImage(byte[] imageBytes) {
+        pieces.add(new ImagePiece(imageBytes));
+    }
+
+    public static void addImage(Bitmap image) {
+        pieces.add(new ImagePiece(image));
+    }
+
+    public static void generateImage(String fileName) {
+        Bitmap newBitmap = null;
+
+        try {
+            int _sideMargin = (int) (width * sideMarginPercentage) / 100;
+            int _bottomMargin = (int) (width * bottomMarginPercentage) / 100;
+            int _topMargin = (int) (width * topMarginPercentage) / 100;
+
+            Iterator iterator = pieces.iterator();
+            int height = ((Piece) iterator.next()).getHeight() + _topMargin + _bottomMargin;
+            while (iterator.hasNext()) {
+                height += ((Piece) iterator.next()).getHeight();
+            }
+
+            newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas newCanvas = new Canvas(newBitmap);
+
+            Paint paint2 = new Paint();
+            paint2.setColor(Color.WHITE);
+            paint2.setStyle(Paint.Style.FILL);
+            newCanvas.drawPaint(paint2);
+
+            iterator = pieces.iterator();
+            int currentHeight = _topMargin;
+            while (iterator.hasNext()) {
+                Piece currentPiece = ((Piece) iterator.next());
+
+                int x = _sideMargin;
+                if (currentPiece.getPaint().getTextAlign() == Paint.Align.CENTER) {
+                    x = width / 2;
+                } else if (currentPiece.getPaint().getTextAlign() == Paint.Align.RIGHT) {
+                    x = width - _sideMargin;
+                }
+
+                if (currentPiece instanceof TextPiece) {
+                    currentHeight += currentPiece.getHeight();
+                    newCanvas.drawText(((TextPiece) currentPiece).getText(), x, currentHeight, currentPiece.getPaint());
+                } else if (currentPiece instanceof ImagePiece) {
+                    newCanvas.drawBitmap(((ImagePiece) currentPiece).getImage(), (x - (((ImagePiece) currentPiece).getImage().getWidth() / 2)), currentHeight, currentPiece.getPaint());
+                    currentHeight += currentPiece.getHeight();
+                }
+            }
+        } catch (Exception e) {
+
+        }
+
+        try {
+            File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/");
+            if (!dir.exists())
+                dir.mkdirs();
+            File file = new File(dir, fileName);
+            FileOutputStream fOut = new FileOutputStream(file);
+
+            newBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut.flush();
+            fOut.close();
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
+
+    public String converterValue(Integer value) {
+        Locale ptBr = new Locale("pt", "BR");
+        String valorString = NumberFormat.getCurrencyInstance(ptBr).format(value);
+        return valorString;
+    }
+
+    public String returnNumberFi(Integer total, Integer actual) {
+        String newValue = actual + "/" + total;
+        return newValue;
+    }
+
+    @ReactMethod
+    public void ImageAndPrint(String jsonStr, final Promise promise) throws JSONException {
+        final JSONObject jsonObject = new JSONObject(jsonStr);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        final JSONArray products = jsonObject.getJSONArray("products");
+
+        Runnable runnableTask = new Runnable() {
+            @Override
+            public void run() {
+                setAppIdendification("pdv365", "0.0.1");
+                initNewImage();
+
+                for(int i = 0; i < products.length(); i++){
+                    JSONObject o = null;
+                    try {
+                        o = products.getJSONObject(i);
+                        setBold(true);
+                        setFontSize(128);
+                        setAlign(1);
+                        addTextLine(((String) o.get("name")).toUpperCase());
+                        addTextLine(converterValue((Integer) o.get("final_value")));
+                        setLineSpacing(140);
+                        setBold(false);
+                        setFontSize(60);
+                        addTextLine(((String) jsonObject.get("event_name")).toUpperCase());
+                        setLineSpacing(25);
+                        addTextLine(((String) jsonObject.get("event_sector_name")).toUpperCase());
+                        setLineSpacing(110);
+                        addTextLine(returnNumberFi(products.length(), i + 1));
+                        setBold(true);
+                        addTextLine(((String) jsonObject.get("operator_name") + " " + "-" + " " + (String) jsonObject.get("serial")).toUpperCase());
+                        setLineSpacing(25);
+                        addTextLine(((String) jsonObject.get("sale_date")).toUpperCase());
+                        setLineSpacing(60);
+                        setFontSize(30);
+                        setBold(false);
+                        addTextLine("__________________________________________________________________________________________");
+                        setFontSize(60);
+                        addTextLine("RECORTE AQUI");
+                        setFontSize(30);
+                        addTextLine("__________________________________________________________________________________________");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                generateImage("imagem");
+                countPrint = 0;
+                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print");
+                File[] arquivos = file.listFiles();
+                countImages = arquivos.length;
+
+                for (File fileTmp : arquivos) {
+                    final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
+                    PlugPagPrinterListener listener = new PlugPagPrinterListener() {
+                        @Override
+                        public void onError(PlugPagPrintResult plugPagPrintResult) {
+                            promise.reject("error", plugPagPrintResult.getMessage());
+                        }
+
+                        @Override
+                        public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
+                            countPrint++;
+                            if (countPrint == countImages) {
+                                promise.resolve(null);
+                            }
+                        }
+                    };
+
+                    plugPag.setPrinterListener(listener);
+                    plugPag.printFromFile(data);
+                    fileTmp.delete();
+                }
+            }
+        };
+
+        executor.execute(runnableTask);
+        executor.shutdown();
     }
 
     @ReactMethod
