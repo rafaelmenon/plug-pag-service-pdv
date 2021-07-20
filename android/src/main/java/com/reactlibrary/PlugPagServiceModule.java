@@ -1,5 +1,6 @@
 package com.reactlibrary;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +16,11 @@ import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 import android.content.pm.PackageInfo;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -33,7 +39,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -89,6 +97,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private static String breakLineAuxString;
     private static LinkedList<Piece> pieces;
     private static String fontFamily = "sans-serif";
+    private static String lastQrMsg;
+    private static Bitmap lastQrImage;
+
 
     private PackageInfo getPackageInfo() throws Exception {
         return getReactApplicationContext().getPackageManager().getPackageInfo(getReactApplicationContext().getPackageName(), 0);
@@ -420,15 +431,37 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         }
     }
 
-    public String converterValue(Integer value) {
-        Locale ptBr = new Locale("pt", "BR");
-        String valorString = NumberFormat.getCurrencyInstance(ptBr).format(value);
-        return valorString;
-    }
-
     public String returnNumberFi(Integer total, Integer actual) {
         String newValue = actual + "/" + total;
         return newValue;
+    }
+
+    public static Bitmap generateQrCode(String codeMsg, int size) {
+        if (!codeMsg.equals(lastQrMsg)) {
+            try {
+                QRCodeWriter qrCodeWriter = new QRCodeWriter();
+
+                BitMatrix bitMatrix = qrCodeWriter.encode(codeMsg, BarcodeFormat.QR_CODE, size, size);
+                Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
+
+                for (Integer x = 0; x < size; x++) {
+                    for (Integer y = 0; y < size; y++) {
+                        bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                    }
+                }
+
+                lastQrMsg = codeMsg;
+                lastQrImage = bitmap;
+
+                return bitmap;
+            } catch (WriterException e) {
+                e.printStackTrace();
+            }
+        } else {
+            return lastQrImage;
+        }
+
+        return null;
     }
 
     @ReactMethod
@@ -437,7 +470,10 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         final JSONArray products = jsonObject.getJSONArray("products");
 
+        final Bitmap image = BitmapFactory.decodeFile((String) jsonObject.get("logo_path"));
+
         Runnable runnableTask = new Runnable() {
+            @TargetApi(Build.VERSION_CODES.O)
             @Override
             public void run() {
                 setAppIdendification("pdv365", "0.0.1");
@@ -445,19 +481,59 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
                 for(int i = 0; i < products.length(); i++){
                     JSONObject o = null;
+
                     try {
                         o = products.getJSONObject(i);
+
+
                         setBold(true);
                         setFontSize(128);
                         setAlign(1);
+                        addImage(Bitmap.createScaledBitmap(image, 800, 200, false));
                         addTextLine(((String) o.get("name")).toUpperCase());
-                        addTextLine(converterValue((Integer) o.get("final_value")));
+
+                        if (o.getJSONArray("additional").length() > 0) {
+                            setBold(true);
+                            setFontSize(50);
+                            setLineSpacing(50);
+                            addTextLine("ADICIONAIS");
+                            JSONObject x = null;
+
+                            for(int a = 0; a < o.getJSONArray("additional").length(); a++) {
+                                x = o.getJSONArray("additional").getJSONObject(a);
+                                setLineSpacing(25);
+                                addTextLine(+(Integer) x.get("quantity") + "    " + ((String) x.get("name")).toUpperCase() + "   " +   ((String) x.get("value")).toUpperCase());
+                                setFontSize(30);
+                                addTextLine("__________________________________________________________");
+                                setFontSize(50);
+                            }
+                        }
+                        setFontSize(128);
+                        addTextLine(((String) o.get("final_value")).toUpperCase());
+
+                        if ((boolean) jsonObject.get("print_qr_code") == true) {
+                            addImage(generateQrCode((String) o.get("uuid"), 600));
+                        }
+                        if ((boolean) o.get("is_reprint") == true) {
+                            setBold(true);
+                            setLineSpacing(110);
+                            addTextLine("REIMPRESSÃO");
+                        }
                         setLineSpacing(140);
                         setBold(false);
                         setFontSize(60);
                         addTextLine(((String) jsonObject.get("event_name")).toUpperCase());
                         setLineSpacing(25);
                         addTextLine(((String) jsonObject.get("event_sector_name")).toUpperCase());
+                        setLineSpacing(110);
+                        if ((boolean) jsonObject.get("is_waiter_sale") == true) {
+                            setBold(true);
+                            setLineSpacing(110);
+                            addTextLine("GARÇOM");
+                            setLineSpacing(25);
+                            addTextLine(((String) jsonObject.get("waiter_name")).toUpperCase());
+                        }
+                        setBold(false);
                         setLineSpacing(110);
                         addTextLine(returnNumberFi(products.length(), i + 1));
                         setBold(true);
@@ -467,11 +543,12 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         setLineSpacing(60);
                         setFontSize(30);
                         setBold(false);
-                        addTextLine("__________________________________________________________________________________________");
+                        addTextLine("____________________________________________________________________________________");
                         setFontSize(60);
                         addTextLine("RECORTE AQUI");
                         setFontSize(30);
-                        addTextLine("__________________________________________________________________________________________");
+                        addTextLine("____________________________________________________________________________________");
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -502,12 +579,14 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     plugPag.setPrinterListener(listener);
                     plugPag.printFromFile(data);
                     fileTmp.delete();
+                    System.gc();
                 }
             }
         };
 
         executor.execute(runnableTask);
         executor.shutdown();
+        System.gc();
     }
 
     @ReactMethod
