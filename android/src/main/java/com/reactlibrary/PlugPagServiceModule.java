@@ -1,6 +1,7 @@
 package com.reactlibrary;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -99,6 +100,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     private static String fontFamily = "sans-serif";
     private static String lastQrMsg;
     private static Bitmap lastQrImage;
+
 
 
     private PackageInfo getPackageInfo() throws Exception {
@@ -465,6 +467,182 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void printGrouped(String jsonStr, final Promise promise) throws JSONException {
+        final JSONObject jsonObject = new JSONObject(jsonStr);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        final JSONArray products = jsonObject.getJSONArray("products");
+        final Bitmap image = BitmapFactory.decodeFile((String) jsonObject.get("logo_path"));
+
+        Runnable runnableTask = new Runnable() {
+            @TargetApi(Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                setAppIdendification("pdv365", "0.0.1");
+                initNewImage();
+                setBold(true);
+                setFontSize(128);
+                setAlign(1);
+                addImage(Bitmap.createScaledBitmap(image, 800, 200, false));
+                for(int i = 0; i < products.length(); i++){
+                    JSONObject o = null;
+                    try {
+                        o = products.getJSONObject(i);
+                        setFontSize(80);
+                        addTextLine((Integer) o.get("quantity") + " " +((String) o.get("name")).toUpperCase());
+                        setLineSpacing(60);
+                        if (o.getJSONArray("additional").length() > 0) {
+                            setBold(true);
+                            setFontSize(50);
+                            setLineSpacing(50);
+                            addTextLine("ADICIONAIS");
+                            JSONObject x = null;
+
+                            for(int a = 0; a < o.getJSONArray("additional").length(); a++) {
+                                x = o.getJSONArray("additional").getJSONObject(a);
+                                setLineSpacing(25);
+                                addTextLine(+(Integer) x.get("quantity") + "    " + ((String) x.get("name")).toUpperCase() + "   " +   ((String) x.get("value")).toUpperCase());
+                                setFontSize(30);
+                                addTextLine("_____________________________________________");
+                                setFontSize(50);
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                setBold(true);
+
+                try {
+                    if ((boolean) jsonObject.get("print_qr_code") == true) {
+                        addImage(generateQrCode((String) jsonObject.get("sale_id"), 600));
+                    }
+                    if ((boolean) jsonObject.get("is_reprint") == true) {
+                        setBold(true);
+                        setLineSpacing(80);
+                        addTextLine("REIMPRESSÃO");
+                    }
+                    setFontSize(128);
+                    addTextLine((String) jsonObject.get("sale_total"));
+                    setLineSpacing(140);
+                    setBold(false);
+                    setFontSize(60);
+                    addTextLine(((String) jsonObject.get("event_name")).toUpperCase());
+                    setLineSpacing(25);
+                    addTextLine(((String) jsonObject.get("event_sector_name")).toUpperCase());
+                    setLineSpacing(90);
+                    if ((boolean) jsonObject.get("is_waiter_sale") == true) {
+                        setBold(true);
+                        setLineSpacing(80);
+                        addTextLine("GARÇOM");
+                        setLineSpacing(25);
+                        addTextLine(((String) jsonObject.get("waiter_name")).toUpperCase());
+                    }
+                    setBold(false);
+                    setLineSpacing(80);
+                    addTextLine(((String) jsonObject.get("operator_name") + " " + "-" + " " + (String) jsonObject.get("serial")).toUpperCase());
+                    setLineSpacing(25);
+                    addTextLine(((String) jsonObject.get("sale_date")).toUpperCase());
+                    setLineSpacing(60);
+                    setFontSize(30);
+                    setBold(false);
+                    addTextLine("__________________________________________");
+                    setFontSize(60);
+                    addTextLine("RECORTE AQUI");
+                    setFontSize(30);
+                    addTextLine("__________________________________________");
+
+                    if (jsonObject.getJSONArray("production_products").length() > 0) {
+                        setBold(true);
+                        setFontSize(95);
+                        addImage(Bitmap.createScaledBitmap(image, 800, 200, false));
+                        addTextLine("FICHA DE PRODUÇÃO");
+                        setFontSize(30);
+                        addTextLine("__________________________________________");
+                        setLineSpacing(60);
+
+                        for(int p = 0; p < jsonObject.getJSONArray("production_products").length(); p++){
+                            JSONObject prodG = null;
+
+                            try {
+                                prodG = jsonObject.getJSONArray("production_products").getJSONObject(p);
+                                setFontSize(80);
+                                addTextLine(+(Integer) prodG.get("quantity") + "    " + ((String) prodG.get("name")).toUpperCase());
+                                if (prodG.getJSONArray("additional").length() > 0) {
+                                    setBold(true);
+                                    setFontSize(50);
+                                    setLineSpacing(50);
+                                    addTextLine("ADICIONAIS");
+                                    JSONObject x = null;
+
+                                    for(int a = 0; a < prodG.getJSONArray("additional").length(); a++) {
+                                        x = prodG.getJSONArray("additional").getJSONObject(a);
+                                        setLineSpacing(25);
+                                        addTextLine(+(Integer) x.get("quantity") + "    " + ((String) x.get("name")).toUpperCase() + "   " +   ((String) x.get("value")).toUpperCase());
+                                        setFontSize(30);
+                                        addTextLine("_____________________________________________");
+                                        setFontSize(50);
+                                    }
+                                }
+                                setAlign(1);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        setFontSize(110);
+                        addTextLine(((String) jsonObject.get("production_total")).toUpperCase());
+                        setFontSize(60);
+                        setBold(false);
+                        setLineSpacing(80);
+                        addTextLine(((String) jsonObject.get("operator_name") + " " + "-" + " " + (String) jsonObject.get("serial")).toUpperCase());
+                        setLineSpacing(25);
+                        addTextLine(((String) jsonObject.get("sale_date")).toUpperCase());
+                        setLineSpacing(60);
+                        setFontSize(30);
+                        setBold(false);
+                        addTextLine("__________________________________________");
+                        setFontSize(60);
+                        addTextLine("RECORTE AQUI");
+                        setFontSize(30);
+                        addTextLine("__________________________________________");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                generateImage("imagem");
+                countPrint = 0;
+                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print");
+                File[] arquivos = file.listFiles();
+                countImages = arquivos.length;
+                for (File fileTmp : arquivos) {
+                    final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
+                    PlugPagPrinterListener listener = new PlugPagPrinterListener() {
+                        @Override
+                        public void onError(PlugPagPrintResult plugPagPrintResult) {
+                            promise.reject("error", plugPagPrintResult.getMessage());
+                        }
+                        @Override
+                        public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
+                            countPrint++;
+                            if (countPrint == countImages) {
+                                promise.resolve(null);
+                            }
+                        }
+                    };
+                    plugPag.setPrinterListener(listener);
+                    plugPag.printFromFile(data);
+                    fileTmp.delete();
+                    System.gc();
+                }
+            }
+        };
+        executor.execute(runnableTask);
+        executor.shutdown();
+        System.gc();
+    }
+
+    @ReactMethod
     public void printProduction(String jsonStr, final Promise promise) throws JSONException {
         final JSONObject jsonObject = new JSONObject(jsonStr);
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -567,7 +745,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 for(int p = 0; p < products.length(); p++) {
                     try {
                         prod = jsonObject.getJSONArray("production_products").getJSONObject(p);
-                        System.out.println("prod ->>>" + prod);
                         setLineSpacing(100);
                         setFontSize(80);
                         setAlign(3);
