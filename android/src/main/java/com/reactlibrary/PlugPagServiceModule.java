@@ -482,7 +482,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 setBold(true);
                 setFontSize(128);
                 setAlign(1);
-                addImage(Bitmap.createScaledBitmap(image, 800, 200, false));
+                addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
                 for(int i = 0; i < products.length(); i++){
                     JSONObject o = null;
                     try {
@@ -555,7 +555,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     if (jsonObject.getJSONArray("production_products").length() > 0) {
                         setBold(true);
                         setFontSize(95);
-                        addImage(Bitmap.createScaledBitmap(image, 800, 200, false));
+                        addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
                         addTextLine("FICHA DE PRODUÇÃO");
                         setFontSize(30);
                         addTextLine("__________________________________________");
@@ -563,7 +563,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
 
                         for(int p = 0; p < jsonObject.getJSONArray("production_products").length(); p++){
                             JSONObject prodG = null;
-
                             try {
                                 prodG = jsonObject.getJSONArray("production_products").getJSONObject(p);
                                 setFontSize(80);
@@ -662,7 +661,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         setBold(true);
                         setFontSize(128);
                         setAlign(1);
-                        addImage(Bitmap.createScaledBitmap(image, 800, 200, false));
+                        addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
                         addTextLine(((String) o.get("name")).toUpperCase());
                         if (o.getJSONArray("additional").length() > 0) {
                             setBold(true);
@@ -736,7 +735,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 }
                 setBold(true);
                 setFontSize(95);
-                addImage(Bitmap.createScaledBitmap(image, 800, 200, false));
+                addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
                 addTextLine("FICHA DE PRODUÇÃO");
                 setFontSize(30);
                 addTextLine("__________________________________________");
@@ -844,7 +843,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         setBold(true);
                         setFontSize(128);
                         setAlign(1);
-                        addImage(Bitmap.createScaledBitmap(image, 800, 200, false));
+                        addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
                         addTextLine(((String) o.get("name")).toUpperCase());
                         if (o.getJSONArray("additional").length() > 0) {
                             setBold(true);
