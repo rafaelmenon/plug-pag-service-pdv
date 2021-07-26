@@ -564,7 +564,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                             try {
                                 prodG = jsonObject.getJSONArray("production_products").getJSONObject(p);
                                 setFontSize(80);
-                                addTextLine(+(Integer) prodG.get("quantity") + "    " + ((String) prodG.get("name")).toUpperCase());
+                                String second = !prodG.isNull("second_name") ? ((String) prodG.get("second_name")).toUpperCase()  : "";
+                                addTextLine(+(Integer) prodG.get("quantity") + "    " + ((String) prodG.get("name")).toUpperCase() + second);
                                 if (prodG.getJSONArray("additional").length() > 0) {
                                     setBold(true);
                                     setFontSize(50);
@@ -593,6 +594,17 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         } else {
                             addTextLine("CORTESIA");
                         }
+                        setBold(false);
+                        setLineSpacing(60);
+                        setFontSize(60);
+                        addTextLine("_________________________________");
+                        setBold(true);
+                        addTextLine("SENHA");
+                        setFontSize(128);
+                        addTextLine(((String) jsonObject.get("production_password")).toUpperCase());
+                        setFontSize(60);
+                        setBold(false);
+                        addTextLine("_________________________________");
                         setFontSize(60);
                         setBold(false);
                         setLineSpacing(80);
