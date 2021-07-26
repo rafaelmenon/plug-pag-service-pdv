@@ -522,13 +522,13 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     } else {
                         addTextLine("CORTESIA");
                     }
-                    setLineSpacing(140);
+                    setLineSpacing(80);
                     setBold(false);
                     setFontSize(60);
                     addTextLine(((String) jsonObject.get("event_name")).toUpperCase());
                     setLineSpacing(25);
                     addTextLine(((String) jsonObject.get("event_sector_name")).toUpperCase());
-                    setLineSpacing(90);
+                    setLineSpacing(80);
                     if ((boolean) jsonObject.get("is_waiter_sale") == true) {
                         setBold(true);
                         setLineSpacing(80);
@@ -710,7 +710,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                             setLineSpacing(80);
                             addTextLine("REIMPRESSÃO");
                         }
-                        setLineSpacing(140);
+                        setLineSpacing(80);
                         setBold(false);
                         setFontSize(60);
                         addTextLine(((String) jsonObject.get("event_name")).toUpperCase());
@@ -728,7 +728,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                             setBold(false);
                             addTextLine("_________________________________");
                         }
-                        setLineSpacing(90);
+                        setLineSpacing(80);
                         if ((boolean) jsonObject.get("is_waiter_sale") == true) {
                             setBold(true);
                             setLineSpacing(80);
@@ -766,7 +766,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 for(int p = 0; p < products.length(); p++) {
                     try {
                         prod = jsonObject.getJSONArray("production_products").getJSONObject(p);
-                        setLineSpacing(100);
+                        setLineSpacing(80);
                         setFontSize(80);
                         setAlign(3);
                         String second = !prod.isNull("second_name") ? ((String) prod.get("second_name")).toUpperCase()  : "";
@@ -812,7 +812,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     addTextLine("_________________________________");
                     setFontSize(60);
                     setBold(false);
-                    setLineSpacing(110);
+                    setLineSpacing(80);
                     setBold(true);
                     addTextLine(((String) jsonObject.get("operator_name") + " " + "-" + " " + (String) jsonObject.get("serial")).toUpperCase());
                     setLineSpacing(25);
@@ -903,16 +903,20 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                             }
                         }
                         setFontSize(128);
-                        addTextLine(((String) o.get("final_value")).toUpperCase());
+                        if ((boolean) jsonObject.get("is_courtesy") == false) {
+                            addTextLine(((String) o.get("final_value")).toUpperCase());
+                        } else {
+                            addTextLine("CORTESIA");
+                        }
                         if ((boolean) jsonObject.get("print_qr_code") == true) {
                             addImage(generateQrCode((String) o.get("uuid"), 600));
                         }
                         if ((boolean) o.get("is_reprint") == true) {
                             setBold(true);
-                            setLineSpacing(110);
+                            setLineSpacing(50);
                             addTextLine("REIMPRESSÃO");
                         }
-                        setLineSpacing(80);
+                        setLineSpacing(50);
                         setBold(false);
                         setFontSize(60);
                         addTextLine(((String) jsonObject.get("event_name")).toUpperCase());
@@ -941,7 +945,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         addTextLine("RECORTE AQUI");
                         setFontSize(30);
                         addTextLine("__________________________________________________________");
-                        setLineSpacing(100);
+                        setLineSpacing(50);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
