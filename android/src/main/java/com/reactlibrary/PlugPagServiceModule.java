@@ -1,7 +1,6 @@
 package com.reactlibrary;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,18 +39,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -488,7 +479,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     try {
                         o = products.getJSONObject(i);
                         setFontSize(80);
-                        addTextLine((Integer) o.get("quantity") + " " +((String) o.get("name")).toUpperCase());
+                        setAlign(3);
+                        String second = !o.isNull("second_name") ? ((String) o.get("second_name")).toUpperCase()  : "";
+                        addTextLine((Integer) o.get("quantity") + " " + ((String) o.get("name")).toUpperCase() + second);
                         setLineSpacing(60);
                         if (o.getJSONArray("additional").length() > 0) {
                             setBold(true);
@@ -514,6 +507,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 setBold(true);
 
                 try {
+                    setAlign(1);
                     if ((boolean) jsonObject.get("print_qr_code") == true) {
                         addImage(generateQrCode((String) jsonObject.get("sale_id"), 600));
                     }
@@ -523,7 +517,11 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         addTextLine("REIMPRESSÃO");
                     }
                     setFontSize(128);
-                    addTextLine((String) jsonObject.get("sale_total"));
+                    if ((boolean) jsonObject.get("is_courtesy") == false) {
+                        addTextLine((String) jsonObject.get("sale_total"));
+                    } else {
+                        addTextLine("CORTESIA");
+                    }
                     setLineSpacing(140);
                     setBold(false);
                     setFontSize(60);
@@ -590,7 +588,11 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         }
 
                         setFontSize(110);
-                        addTextLine(((String) jsonObject.get("production_total")).toUpperCase());
+                        if ((boolean) jsonObject.get("is_courtesy") == false) {
+                            addTextLine(((String) jsonObject.get("production_total")).toUpperCase());
+                        } else {
+                            addTextLine("CORTESIA");
+                        }
                         setFontSize(60);
                         setBold(false);
                         setLineSpacing(80);
@@ -641,6 +643,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         System.gc();
     }
 
+
     @ReactMethod
     public void printProduction(String jsonStr, final Promise promise) throws JSONException {
         final JSONObject jsonObject = new JSONObject(jsonStr);
@@ -663,6 +666,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         setAlign(1);
                         addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
                         addTextLine(((String) o.get("name")).toUpperCase());
+                        if (!o.isNull("second_name")) {
+                            addTextLine(((String) o.get("second_name")).toUpperCase());
+                        }
                         if (o.getJSONArray("additional").length() > 0) {
                             setBold(true);
                             setFontSize(50);
@@ -679,7 +685,11 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                             }
                         }
                         setFontSize(128);
-                        addTextLine(((String) o.get("final_value")).toUpperCase());
+                        if ((boolean) jsonObject.get("is_courtesy") == false) {
+                            addTextLine(((String) o.get("final_value")).toUpperCase());
+                        } else {
+                            addTextLine("CORTESIA");
+                        }
                         if ((boolean) jsonObject.get("print_qr_code") == true) {
                             addImage(generateQrCode((String) o.get("uuid"), 600));
                         }
@@ -747,7 +757,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         setLineSpacing(100);
                         setFontSize(80);
                         setAlign(3);
-                        addTextLine(+(Integer) prod.get("quantity") + "    " + ((String) prod.get("name")).toUpperCase());
+                        String second = !prod.isNull("second_name") ? ((String) prod.get("second_name")).toUpperCase()  : "";
+                        addTextLine((Integer) prod.get("quantity") + "    " + ((String) prod.get("name")).toUpperCase() + second) ;
                         if (prod.getJSONArray("additional").length() > 0) {
                             setBold(true);
                             setFontSize(50);
@@ -771,7 +782,22 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 }
                 setFontSize(128);
                 try {
-                    addTextLine(((String) jsonObject.get("production_total")).toUpperCase());
+                    if ((boolean) jsonObject.get("is_courtesy") == false) {
+                        addTextLine(((String) jsonObject.get("production_total")).toUpperCase());
+                    } else {
+                        addTextLine("CORTESIA");
+                    }
+                    setBold(false);
+                    setLineSpacing(60);
+                    setFontSize(60);
+                    addTextLine("_________________________________");
+                    setBold(true);
+                    addTextLine("SENHA");
+                    setFontSize(128);
+                    addTextLine(((String) jsonObject.get("production_password")).toUpperCase());
+                    setFontSize(60);
+                    setBold(false);
+                    addTextLine("_________________________________");
                     setFontSize(60);
                     setBold(false);
                     setLineSpacing(110);
@@ -845,6 +871,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         setAlign(1);
                         addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
                         addTextLine(((String) o.get("name")).toUpperCase());
+                        if (!o.isNull("second_name")) {
+                            addTextLine(((String) o.get("second_name")).toUpperCase());
+                        }
                         if (o.getJSONArray("additional").length() > 0) {
                             setBold(true);
                             setFontSize(50);
