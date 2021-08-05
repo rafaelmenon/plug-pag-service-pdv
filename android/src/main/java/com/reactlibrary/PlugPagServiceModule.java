@@ -500,19 +500,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                             }
                         }
                         setAlign(1);
-                        if ((boolean) o.get("has_production_sheet") == true) {
-                            setBold(false);
-                            setLineSpacing(60);
-                            setFontSize(60);
-                            addTextLine("_________________________________");
-                            setBold(true);
-                            addTextLine("SENHA");
-                            setFontSize(128);
-                            addTextLine(((String) jsonObject.get("production_password")).toUpperCase());
-                            setFontSize(60);
-                            setBold(false);
-                            addTextLine("_________________________________");
-                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -521,6 +508,19 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 setBold(true);
 
                 try {
+                    if ((boolean) jsonObject.get("has_production_sheet") == true) {
+                        setBold(false);
+                        setLineSpacing(60);
+                        setFontSize(60);
+                        addTextLine("_________________________________");
+                        setBold(true);
+                        addTextLine("SENHA");
+                        setFontSize(128);
+                        addTextLine(((String) jsonObject.get("production_password")).toUpperCase());
+                        setFontSize(60);
+                        setBold(false);
+                        addTextLine("_________________________________");
+                    }
                     setAlign(1);
                     if ((boolean) jsonObject.get("print_qr_code") == true) {
                         addImage(generateQrCode((String) jsonObject.get("sale_id"), 600));
