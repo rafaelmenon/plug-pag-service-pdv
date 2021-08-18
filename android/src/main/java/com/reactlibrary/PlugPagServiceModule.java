@@ -998,6 +998,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void printTicket(String jsonStr, final Promise promise) throws JSONException {}
+
+    @ReactMethod
     public void doPayment(String jsonStr, final Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
 
