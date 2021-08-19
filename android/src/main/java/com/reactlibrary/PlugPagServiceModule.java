@@ -998,64 +998,67 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void printTicket(String jsonStr, final Promise promise) throws JSONException {}
-
-    @ReactMethod
     public void doPayment(String jsonStr, final Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
 
-        plugPag.setEventListener(new PlugPagEventListener() {
-            @Override
-            public void onEvent(final PlugPagEventData plugPagEventData) {
-                messageCard = plugPagEventData.getCustomMessage();
-                int code = plugPagEventData.getEventCode();
+        final PlugPagActivationData activationData = new PlugPagActivationData("959914");
+        PlugPagInitializationResult teste = plugPag.initializeAndActivatePinpad(activationData);
 
-                if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD || plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
-                    if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD) {
-                        countPassword++;
-                    } else if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
-                        countPassword = 0;
+        if (teste.getResult() == plugPag.RET_OK) {
+            plugPag.setEventListener(new PlugPagEventListener() {
+                @Override
+                public void onEvent(final PlugPagEventData plugPagEventData) {
+                    messageCard = plugPagEventData.getCustomMessage();
+                    int code = plugPagEventData.getEventCode();
+
+                    if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD || plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
+                        if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_DIGIT_PASSWORD) {
+                            countPassword++;
+                        } else if (plugPagEventData.getEventCode() == PlugPagEventData.EVENT_CODE_NO_PASSWORD) {
+                            countPassword = 0;
+                        }
+
+                        if (countPassword == 0 ) {
+                            getPassword = "Senha:";
+                        } else if (countPassword == 1) {
+                            getPassword = "Senha: *";
+                        } else if (countPassword == 2) {
+                            getPassword = "Senha: **";
+                        } else if (countPassword == 3) {
+                            getPassword = "Senha: ***";
+                        } else if (countPassword == 4) {
+                            getPassword = "Senha: ****";
+                        } else if (countPassword == 5) {
+                            getPassword = "Senha: *****";
+                        } else if (countPassword == 6 || countPassword > 6) {
+                            getPassword = "Senha: ******";
+                        }
+
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", getPassword);
+                    } else {
+                        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", messageCard);
                     }
-
-                    if (countPassword == 0 ) {
-                        getPassword = "Senha:";
-                    } else if (countPassword == 1) {
-                        getPassword = "Senha: *";
-                    } else if (countPassword == 2) {
-                        getPassword = "Senha: **";
-                    } else if (countPassword == 3) {
-                        getPassword = "Senha: ***";
-                    } else if (countPassword == 4) {
-                        getPassword = "Senha: ****";
-                    } else if (countPassword == 5) {
-                        getPassword = "Senha: *****";
-                    } else if (countPassword == 6 || countPassword > 6) {
-                        getPassword = "Senha: ******";
-                    }
-
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", getPassword);
-                } else {
-                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("eventPayments", messageCard);
                 }
-            }
-        });
+            });
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+            final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-        Runnable runnableTask = new Runnable() {
-            @Override
-            public void run() {
-                PlugPagTransactionResult transactionResult = plugPag.doPayment(paymentData);
-                final WritableMap map = Arguments.createMap();
-                map.putInt("retCode", transactionResult.getResult());
-                map.putString("transactionCode", transactionResult.getTransactionCode());
-                map.putString("transactionId", transactionResult.getTransactionId());
-                promise.resolve(map);
-            }
-        };
-
-        executor.execute(runnableTask);
-        executor.shutdown();
+            Runnable runnableTask = new Runnable() {
+                @Override
+                public void run() {
+                    PlugPagTransactionResult transactionResult = plugPag.doPayment(paymentData);
+                    final WritableMap map = Arguments.createMap();
+                    map.putInt("retCode", transactionResult.getResult());
+                    map.putString("transactionCode", transactionResult.getTransactionCode());
+                    map.putString("transactionId", transactionResult.getTransactionId());
+                    promise.resolve(map);
+                    executor.isTerminated();
+                    System.gc();
+                }
+            };
+            executor.execute(runnableTask);
+            executor.shutdown();
+        }
     }
 
     @ReactMethod
