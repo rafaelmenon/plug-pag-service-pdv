@@ -1,10 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.reactlibrary">
-
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="br.com.uol.pagseguro.permission.MANAGE_PAYMENTS"/>
     <application android:hardwareAccelerated="true" />
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
-
 </manifest>
