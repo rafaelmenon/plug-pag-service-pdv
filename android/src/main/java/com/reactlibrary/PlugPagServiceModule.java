@@ -416,7 +416,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             File file = new File(dir, fileName);
             FileOutputStream fOut = new FileOutputStream(file);
 
-            newBitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 1, fOut);
             fOut.flush();
             fOut.close();
         } catch (Exception e) {
@@ -460,7 +460,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void printGrouped(String jsonStr, final Promise promise) throws JSONException {
         final JSONObject jsonObject = new JSONObject(jsonStr);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        final ExecutorService executor = Executors.newSingleThreadExecutor();
         final JSONArray products = jsonObject.getJSONArray("products");
         final Bitmap image = BitmapFactory.decodeFile((String) jsonObject.get("logo_path"));
 
@@ -637,42 +637,32 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     e.printStackTrace();
                 }
                 generateImage("imagem");
-                countPrint = 0;
-                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print");
-                File[] arquivos = file.listFiles();
-                countImages = arquivos.length;
-                for (File fileTmp : arquivos) {
-                    final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
-                    PlugPagPrinterListener listener = new PlugPagPrinterListener() {
-                        @Override
-                        public void onError(PlugPagPrintResult plugPagPrintResult) {
-                            promise.reject("error", plugPagPrintResult.getMessage());
-                        }
-                        @Override
-                        public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
-                            countPrint++;
-                            if (countPrint == countImages) {
-                                promise.resolve(null);
-                            }
-                        }
-                    };
-                    plugPag.setPrinterListener(listener);
-                    plugPag.printFromFile(data);
-                    fileTmp.delete();
-                    System.gc();
-                }
+
+                final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/imagem" , 1, 10 * 12);
+                PlugPagPrinterListener listener = new PlugPagPrinterListener() {
+                    @Override
+                    public void onError(PlugPagPrintResult plugPagPrintResult) {
+                        promise.reject("error", plugPagPrintResult.getMessage());
+                    }
+                    @Override
+                    public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
+                        promise.resolve(null);
+                        executor.isTerminated();
+                    }
+                };
+                plugPag.setPrinterListener(listener);
+                plugPag.printFromFile(data);
             }
         };
         executor.execute(runnableTask);
         executor.shutdown();
-        System.gc();
     }
 
 
     @ReactMethod
     public void printProduction(String jsonStr, final Promise promise) throws JSONException {
         final JSONObject jsonObject = new JSONObject(jsonStr);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        final ExecutorService executor = Executors.newSingleThreadExecutor();
         final JSONArray products = jsonObject.getJSONArray("products");
         final Bitmap image = BitmapFactory.decodeFile((String) jsonObject.get("logo_path"));
 
@@ -842,30 +832,20 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     e.printStackTrace();
                 }
                 generateImage("imagem");
-                countPrint = 0;
-                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print");
-                File[] arquivos = file.listFiles();
-                countImages = arquivos.length;
-                for (File fileTmp : arquivos) {
-                    final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
-                    PlugPagPrinterListener listener = new PlugPagPrinterListener() {
-                        @Override
-                        public void onError(PlugPagPrintResult plugPagPrintResult) {
-                            promise.reject("error", plugPagPrintResult.getMessage());
-                        }
-                        @Override
-                        public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
-                            countPrint++;
-                            if (countPrint == countImages) {
-                                promise.resolve(null);
-                            }
-                        }
-                    };
-                    plugPag.setPrinterListener(listener);
-                    plugPag.printFromFile(data);
-                    fileTmp.delete();
-                    System.gc();
-                }
+                final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/imagem", 1, 10 * 12);
+                PlugPagPrinterListener listener = new PlugPagPrinterListener() {
+                    @Override
+                    public void onError(PlugPagPrintResult plugPagPrintResult) {
+                        promise.reject("error", plugPagPrintResult.getMessage());
+                    }
+                    @Override
+                    public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
+                        promise.resolve(null);
+                        executor.isTerminated();
+                    }
+                };
+                plugPag.setPrinterListener(listener);
+                plugPag.printFromFile(data);
             }
         };
         executor.execute(runnableTask);
@@ -876,7 +856,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void ImageAndPrint(String jsonStr, final Promise promise) throws JSONException {
         final JSONObject jsonObject = new JSONObject(jsonStr);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        final ExecutorService executor = Executors.newSingleThreadExecutor();
         final JSONArray products = jsonObject.getJSONArray("products");
 
         final Bitmap image = BitmapFactory.decodeFile((String) jsonObject.get("logo_path"));
@@ -964,42 +944,39 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     }
                 }
                 generateImage("imagem");
-                countPrint = 0;
-                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print");
-                File[] arquivos = file.listFiles();
-                countImages = arquivos.length;
 
-                for (File fileTmp : arquivos) {
-                    final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/" + fileTmp.getName(), 4, 10 * 12);
-                    PlugPagPrinterListener listener = new PlugPagPrinterListener() {
-                        @Override
-                        public void onError(PlugPagPrintResult plugPagPrintResult) {
-                            promise.reject("error", plugPagPrintResult.getMessage());
-                        }
+                final PlugPagPrinterData data = new PlugPagPrinterData( Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/print/imagem", 1, 10 * 12);
+                PlugPagPrinterListener listener = new PlugPagPrinterListener() {
+                    @Override
+                    public void onError(PlugPagPrintResult plugPagPrintResult) {
+                        promise.reject("error", plugPagPrintResult.getMessage());
+                    }
 
-                        @Override
-                        public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
-                            countPrint++;
-                            if (countPrint == countImages) {
-                                promise.resolve(null);
-                            }
-                        }
-                    };
-                    plugPag.setPrinterListener(listener);
-                    plugPag.printFromFile(data);
-                    fileTmp.delete();
-                    System.gc();
-                }
+                    @Override
+                    public void onSuccess(PlugPagPrintResult plugPagPrintResult) {
+                        promise.resolve(null);
+                        executor.isTerminated();
+//
+                    }
+                };
+                plugPag.setPrinterListener(listener);
+                plugPag.printFromFile(data);
+//                    executor.isTerminated();
             }
         };
         executor.execute(runnableTask);
         executor.shutdown();
-        System.gc();
+
     }
 
     @ReactMethod
     public void doPayment(String jsonStr, final Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
+
+        final PlugPagActivationData activationData = new PlugPagActivationData("959914");
+        PlugPagInitializationResult teste = plugPag.initializeAndActivatePinpad(activationData);
+
+        if (teste.getResult() == plugPag.RET_OK) {
             plugPag.setEventListener(new PlugPagEventListener() {
                 @Override
                 public void onEvent(final PlugPagEventData plugPagEventData) {
@@ -1044,7 +1021,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     PlugPagTransactionResult transactionResult = plugPag.doPayment(paymentData);
                     final WritableMap map = Arguments.createMap();
                     map.putInt("retCode", transactionResult.getResult());
-                    map.putString("message", transactionResult.getMessage());
                     map.putString("transactionCode", transactionResult.getTransactionCode());
                     map.putString("transactionId", transactionResult.getTransactionId());
                     promise.resolve(map);
@@ -1054,6 +1030,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             };
             executor.execute(runnableTask);
             executor.shutdown();
+        }
     }
 
     @ReactMethod
