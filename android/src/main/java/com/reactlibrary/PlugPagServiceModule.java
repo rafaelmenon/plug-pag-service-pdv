@@ -463,6 +463,10 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final JSONArray products = jsonObject.getJSONArray("products");
         final Bitmap image = BitmapFactory.decodeFile((String) jsonObject.get("logo_path"));
+        final Bitmap imageQrCode = BitmapFactory.decodeFile((String) jsonObject.get("qr_code_path"));
+        final Bitmap imageQr = Bitmap.createScaledBitmap(imageQrCode, 600, 600, false);
+
+        System.out.println("jsonObject ->>" + jsonObject);
 
         Runnable runnableTask = new Runnable() {
             @TargetApi(Build.VERSION_CODES.O)
@@ -510,18 +514,21 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 try {
                     setBold(false);
                     setLineSpacing(60);
-                    setFontSize(60);
-                    addTextLine("_________________________________");
-                    setBold(true);
-                    addTextLine("SENHA");
-                    setFontSize(128);
-                    addTextLine(((String) jsonObject.get("production_password")).toUpperCase());
-                    setFontSize(60);
-                    setBold(false);
-                    addTextLine("_________________________________");
+                    if (jsonObject.getJSONArray("production_products").length() > 0) {
+                        setFontSize(60);
+                        addTextLine("_________________________________");
+                        setBold(true);
+                        addTextLine("SENHA");
+                        setFontSize(128);
+                        addTextLine(((String) jsonObject.get("production_password")).toUpperCase());
+                        setFontSize(60);
+                        setBold(false);
+                        addTextLine("_________________________________");
+                    }
                     setAlign(1);
                     if ((boolean) jsonObject.get("print_qr_code") == true) {
-                        addImage(generateQrCode((String) jsonObject.get("sale_id"), 600));
+//                        addImage(generateQrCode((String) jsonObject.get("sale_id"), 600));
+                        addImage(imageQr);
                     }
                     if ((boolean) jsonObject.get("is_reprint") == true) {
                         setBold(true);
@@ -665,6 +672,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final JSONArray products = jsonObject.getJSONArray("products");
         final Bitmap image = BitmapFactory.decodeFile((String) jsonObject.get("logo_path"));
+        final Bitmap imageLogo = Bitmap.createScaledBitmap(image, 1000, 400, false);
+//        final Bitmap imageQrCode = BitmapFactory.decodeFile((String) jsonObject.get("qr_code_path"));
+//        final Bitmap imageQr = Bitmap.createScaledBitmap(imageQrCode, 600, 600, false);
 
         Runnable runnableTask = new Runnable() {
             @TargetApi(Build.VERSION_CODES.O)
@@ -679,7 +689,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         setBold(true);
                         setFontSize(128);
                         setAlign(1);
-                        addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
+                        addImage(imageLogo);
                         addTextLine(((String) o.get("name")).toUpperCase());
                         if (!o.isNull("second_name")) {
                             addTextLine(((String) o.get("second_name")).toUpperCase());
@@ -705,9 +715,10 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         } else {
                             addTextLine("CORTESIA");
                         }
-                        if ((boolean) jsonObject.get("print_qr_code") == true) {
-                            addImage(generateQrCode((String) o.get("uuid"), 600));
-                        }
+//                        if ((boolean) jsonObject.get("print_qr_code") == true) {
+////                            addImage(generateQrCode((String) o.get("uuid"), 600));
+//                            addImage(imageQr);
+//                        }
                         if ((boolean) o.get("is_reprint") == true) {
                             setBold(true);
                             setLineSpacing(80);
@@ -760,7 +771,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                 }
                 setBold(true);
                 setFontSize(95);
-                addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
+                addImage(imageLogo);
                 addTextLine("FICHA DE PRODUÇÃO");
                 setFontSize(30);
                 addTextLine("__________________________________________");
@@ -860,6 +871,9 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
         final JSONArray products = jsonObject.getJSONArray("products");
 
         final Bitmap image = BitmapFactory.decodeFile((String) jsonObject.get("logo_path"));
+        final Bitmap imageLogo = Bitmap.createScaledBitmap(image, 1000, 400, false);
+        final Bitmap imageQrCode = BitmapFactory.decodeFile((String) jsonObject.get("qr_code_path"));
+        final Bitmap imageQr = Bitmap.createScaledBitmap(imageQrCode, 600, 600, false);
 
         Runnable runnableTask = new Runnable() {
             @TargetApi(Build.VERSION_CODES.O)
@@ -874,7 +888,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                         setBold(true);
                         setFontSize(128);
                         setAlign(1);
-                        addImage(Bitmap.createScaledBitmap(image, 1000, 400, false));
+                        addImage(imageLogo);
                         addTextLine(((String) o.get("name")).toUpperCase());
                         if (!o.isNull("second_name")) {
                             addTextLine(((String) o.get("second_name")).toUpperCase());
@@ -902,7 +916,8 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                             addTextLine("CORTESIA");
                         }
                         if ((boolean) jsonObject.get("print_qr_code") == true) {
-                            addImage(generateQrCode((String) o.get("uuid"), 600));
+//                            addImage(generateQrCode((String) o.get("uuid"), 600));
+                            addImage(imageQr);
                         }
                         if ((boolean) o.get("is_reprint") == true) {
                             setBold(true);
