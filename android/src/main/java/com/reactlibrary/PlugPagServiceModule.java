@@ -988,10 +988,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
     public void doPayment(String jsonStr, final Promise promise) {
         final PlugPagPaymentData paymentData = JsonParseUtils.getPlugPagPaymentDataFromJson(jsonStr);
 
-        final PlugPagActivationData activationData = new PlugPagActivationData("959914");
-        PlugPagInitializationResult teste = plugPag.initializeAndActivatePinpad(activationData);
-
-        if (teste.getResult() == plugPag.RET_OK) {
             plugPag.setEventListener(new PlugPagEventListener() {
                 @Override
                 public void onEvent(final PlugPagEventData plugPagEventData) {
@@ -1036,6 +1032,7 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
                     PlugPagTransactionResult transactionResult = plugPag.doPayment(paymentData);
                     final WritableMap map = Arguments.createMap();
                     map.putInt("retCode", transactionResult.getResult());
+                    map.putString("message", transactionResult.getMessage());
                     map.putString("transactionCode", transactionResult.getTransactionCode());
                     map.putString("transactionId", transactionResult.getTransactionId());
                     promise.resolve(map);
@@ -1045,7 +1042,6 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             };
             executor.execute(runnableTask);
             executor.shutdown();
-        }
     }
 
     @ReactMethod
