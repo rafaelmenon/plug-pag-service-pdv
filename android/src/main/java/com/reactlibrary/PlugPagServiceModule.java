@@ -1235,4 +1235,18 @@ public class PlugPagServiceModule extends ReactContextBaseJavaModule {
             promise.resolve(null);
         }
     }
+    
+    // Calcular parcelas
+    @ReactMethod
+    public void calculateInstallments(String saleValue, final Promise promise) {
+        try {
+            setAppIdendification("pdv365", "0.0.1");
+            String[] installments = plugPag.calculateInstallments(saleValue);
+            WritableArray nativeArray = Arguments.fromList(Arrays.asList(installments));
+            promise.resolve(nativeArray);
+        }
+        catch(Exception e){
+            promise.reject(e);
+        }
+    }
 }
